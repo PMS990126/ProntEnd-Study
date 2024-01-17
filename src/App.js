@@ -10,7 +10,11 @@ function App() {
                     Edit <code>src/App.js</code> and save to reload.
                 </p>
                 <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
+<<<<<<< HEAD
                     Learn React aaabbbccc
+=======
+                    
+>>>>>>> c0346cd41e5573634003ce7e17b739c7d8157285
                 </a>
             </header>
         </div>
