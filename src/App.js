@@ -1,23 +1,25 @@
 import logo from './logo.svg';
 import './App.css';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Main from './component/Main';
+import Percentage from './component/Percentage';
+import Ranking from './component/Ranking';
+import Header from './component/Header';
+import Nav from './component/Nav';
 
 function App() {
     return (
-        <div className="App">
-            <header className="App-header">
-                <img src={logo} className="App-logo" alt="logo" />
-                <p>
-                    Edit <code>src/App.js</code> and save to reload.
-                </p>
-                <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-<<<<<<< HEAD
-                    Learn React aaabbbccc
-=======
-                    
->>>>>>> c0346cd41e5573634003ce7e17b739c7d8157285
-                </a>
-            </header>
-        </div>
+        <BrowserRouter>
+            <div className="App">
+                <Header />
+                <Nav />
+                <Routes>
+                    <Route path="/" element={<Main />} />
+                    <Route path="/Ranking" element={<Ranking />} />
+                    <Route path="/Percentage" element={<Percentage />} />
+                </Routes>
+            </div>
+        </BrowserRouter>
     );
 }
 
