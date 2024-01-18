@@ -30,6 +30,8 @@
 }
 .title {
     font-family: 'Maplestory Bold';
+    justify-content: flex-start;
+    align-items: center;
 }
 .navbar {
     text-indent: 100px;
