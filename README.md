@@ -1,2 +1,0 @@
-# ProntEnd-Study
-ProntEnd Study
