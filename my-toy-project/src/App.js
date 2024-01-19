@@ -1,25 +1,36 @@
-import logo from './logo.svg';
-import './App.css';
+import * as React from 'react';
+import {BrowserRouter, Routes, Route} from "react-router-dom";
+import styled from "styled-components";
+import Header from "./components/header.js";
+import NavBar from "./components/navBar.js";
+import Footer from "./components/footer.js";
+import Home from "./components/home.js";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return(
+        <BrowserRouter>
+            <Container>
+                <Header/>
+                <NavBar/>
+                <InsideContainer>
+                    <Routes>
+                        <Route path="/Home" element={<Home />} />
+                    </Routes>
+                </InsideContainer>
+                <Footer/>
+            </Container>
+        </BrowserRouter>
+    );
 }
+
+const Container = styled.div`
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+`;
+
+const InsideContainer = styled.div`
+    flex-grow: 1;
+`;
 
 export default App;
