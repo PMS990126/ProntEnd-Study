@@ -1,11 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Header from './component/Header';
+import Nav from './component/Nav';
 import Main from './component/Main';
 import Percentage from './component/Percentage';
 import Ranking from './component/Ranking';
-import Header from './component/Header';
-import Nav from './component/Nav';
 
 function App() {
     return (
