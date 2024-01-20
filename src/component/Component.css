@@ -56,7 +56,7 @@
 .search {
     position: relative;
     width: 300px;
-    margin: auto;
+    margin: 0 auto;
 }
 input {
     width: 100%;

@@ -19,7 +19,7 @@ function Main() {
 
 // function Main() {
 //     const [search, setSearch] = useState('');
-//     const [characters, setCharacters] = useState([
+//     const [characters,  setCharacters] = useState([
 //         // 가상의 캐릭터 데이터
 //         // { nickname: 'Hero' },
 //         // { nickname: 'Warrior' },
