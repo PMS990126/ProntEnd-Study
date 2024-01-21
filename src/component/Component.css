@@ -8,12 +8,11 @@
     background-color: rgba(33, 34, 39);
     display: flex;
     color: white;
-    padding: 6px;
+    padding: 10px;
     width: 100%;
-    text-align: center;
-    font-size: 30px;
+    justify-content: center;
+    font-size: 35px;
     font-family: 'Maplestory Bold';
-    line-height: 1.5;
     text-decoration: none;
     a:link {
         color: white;
@@ -38,7 +37,7 @@
     width: 100%;
     background-color: rgba(39, 40, 46);
     padding: 11px 0px;
-    text-align: left;
+    text-align: center;
 }
 
 .navbarMenu {

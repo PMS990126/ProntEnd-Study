@@ -7,7 +7,7 @@ function Main() {
         <div className="search">
             <div className="title">
                 <img src={mushroomImage} alt="Orange Mushroom" />
-                <h1 className="Maplestory Bold">maple.GG</h1>
+                <h1 className="Maplestory Bold">MAPLE.GG</h1>
             </div>
             <div className="search">
                 <input type="text" placeholder="캐릭터 또는 길드명을 입력하세요." />
