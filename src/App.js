@@ -9,7 +9,8 @@ import Main from './component/Main';
 import Percentage from './component/Percentage';
 import Ranking from './component/Ranking';
 import Footer from './component/Footer';
-import backgroundImage from './picture/Elluel.png'; // 백그라운드 이미지 불러오기
+import backgroundImage from './picture/Elluel.png';
+
 function App() {
     return (
         <BrowserRouter>

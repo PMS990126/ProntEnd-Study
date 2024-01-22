@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import './font.css';
 import mushroomImage from '../picture/Orange_Mushroom.png'; // 이미지 불러오기
 import backgroundImage from '../picture/Elluel.png'; // 백그라운드 이미지 불러오기
+import { NavLink } from 'react-router-dom';
 
 function Main() {
     return (
         <MainContainer>
-            <TitleContainer>
+            <TitleContainer to={'/'}>
                 <TitleImage src={mushroomImage} alt="Orange Mushroom" />
                 <TitleText>maple.GG</TitleText>
             </TitleContainer>
@@ -18,9 +19,7 @@ function Main() {
         </MainContainer>
     );
 }
-const Outbox = styled.div`
-    background: url(${backgroundImage});
-`;
+
 const MainContainer = styled.div`
     display: flex;
     align-items: center;
@@ -31,12 +30,14 @@ const MainContainer = styled.div`
     margin: 0 auto;
 `;
 
-const TitleContainer = styled.div`
+const TitleContainer = styled(NavLink)`
     padding: 3vh;
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
+    text-decoration: none;
+    cursor: pointer;
 `;
 
 const SearchContainer = styled.div`
@@ -55,8 +56,8 @@ const TitleText = styled.div`
 `;
 
 const TitleImage = styled.img`
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
 `;
 
 const SearchBar = styled.input`
