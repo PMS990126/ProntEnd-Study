@@ -1,23 +1,50 @@
 import { NavLink } from 'react-router-dom';
 import React from 'react';
-import './Component.css';
+import styled from 'styled-components';
 
 function Nav() {
     return (
-        <div>
-            <div className="navbar">
-                <NavLink className="navbarMenu" activeClassName="active" exact to="/">
+        <Container>
+            <Navbar>
+                <Navi activeClassName="active" exact to="/">
                     메인
-                </NavLink>
-                <NavLink className="navbarMenu" activeClassName="active" to="/Ranking">
+                </Navi>
+                <Navi activeClassName="active" to="/Ranking">
                     랭킹
-                </NavLink>
-                <NavLink className="navbarMenu" activeClassName="active" to="/Percentage">
+                </Navi>
+                <Navi activeClassName="active" to="/Percentage">
                     확률
-                </NavLink>
-            </div>
-        </div>
+                </Navi>
+            </Navbar>
+        </Container>
     );
 }
+
+const Container = styled.div`
+    background-color: rgba(39, 40, 46);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 11px 0px;
+`;
+
+const Navbar = styled.div`
+    font-size: 13px;
+    color: white;
+    margin: 8px;
+    gap: 5vw;
+`;
+
+const Navi = styled(NavLink)`
+    word-spacing: 20px;
+    font-size: 13px;
+    color: white;
+    margin: 8px;
+    text-decoration: none;
+    &.active {
+        text-decoration: underline;
+    }
+`;
 
 export default Nav;
