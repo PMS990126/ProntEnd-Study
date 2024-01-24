@@ -36,7 +36,6 @@ const Navi = styled(NavLink)`
     text-decoration: none;
 
     &:hover {
-        font-size: 20px;
         color: #5CB85C;
     }
 `;

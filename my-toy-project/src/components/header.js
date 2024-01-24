@@ -27,13 +27,6 @@ const LogoImg = styled.img`
     width: 30px;
     height: 30px;
     margin-right: 5px;
-    transition: transform 10s;
-
-    &:hover {
-        width: 35px;
-        height: 35px;
-        transform: rotate(3600000deg);
-    }
 `;
 
 const LogoText = styled.div`
@@ -42,7 +35,6 @@ const LogoText = styled.div`
     font-family: maple-font;
 
     &:hover {
-        font-size: 35px;
         color: #D06137;
     }
 `;
