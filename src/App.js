@@ -41,12 +41,5 @@ const Container = styled.div`
     flex-direction: column;
     min-height: 100vh;
 `;
-// const InsideContainer = styled.div`
-//     width: 100vw;
-//     height: 100vh;
-//     background: url(${backgroundImage});
-//     background-repeat: no-repeat;
-//     background-size: cover;
-//     flex-grow: 1;
-// `;
+
 export default App;
