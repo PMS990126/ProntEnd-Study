@@ -2,7 +2,9 @@ import React from 'react';
 import styled from 'styled-components';
 import './font.css';
 import mushroomImage from '../picture/Orange_Mushroom.png'; // 이미지 불러오기
-import backgroundImage from '../picture/Elluel.png'; // 백그라운드 이미지 불러오기
+import bgImg1 from '../picture/Elluel.png';
+import bgImg2 from '../picture/Ellev.png';
+import bgImg3 from '../picture/Arcana.png';
 import { NavLink } from 'react-router-dom';
 
 function Main() {
@@ -20,14 +22,24 @@ function Main() {
     );
 }
 
+const backgroundArr=[bgImg1,bgImg2,bgImg3];
+const randomIndex=Math.floor(Math.random()*backgroundArr.length);
+const backgroundImage=backgroundArr[randomIndex];
+
 const MainContainer = styled.div`
+    paddig-top:60px
     display: flex;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     position: relative;
-    width: 300px;
+    width: 100vw;
     margin: 0 auto;
+    background: url(${backgroundImage});
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position:center;
+    flex-grow: 1;
 `;
 
 const TitleContainer = styled(NavLink)`
@@ -62,6 +74,7 @@ const TitleImage = styled.img`
 
 const SearchBar = styled.input`
     width: 100%;
+    max-width:300px;
     border: 1px solid #bbb;
     border-radius: 8px;
     padding: 10px 12px;

@@ -19,13 +19,13 @@ function App() {
             <Container>
                 <Header />
                 <Nav />
-                <InsideContainer>
+                <Container>
                     <Routes>
                         <Route path="/" element={<Main />} />
                         <Route path="/Ranking" element={<Ranking />} />
                         <Route path="/Percentage" element={<Percentage />} />
                     </Routes>
-                </InsideContainer>
+                </Container>
                 <Footer />
             </Container>
         </BrowserRouter>
@@ -41,12 +41,12 @@ const Container = styled.div`
     flex-direction: column;
     min-height: 100vh;
 `;
-const InsideContainer = styled.div`
-    width: 100vw;
-    height: 100vh;
-    background: url(${backgroundImage});
-    background-repeat: no-repeat;
-    background-size: cover;
-    flex-grow: 1;
-`;
+// const InsideContainer = styled.div`
+//     width: 100vw;
+//     height: 100vh;
+//     background: url(${backgroundImage});
+//     background-repeat: no-repeat;
+//     background-size: cover;
+//     flex-grow: 1;
+// `;
 export default App;

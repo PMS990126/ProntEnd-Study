@@ -26,7 +26,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     width: 100%;
-    padding: 11px 0px;
+    padding: 7px 0px;
 `;
 
 const Navbar = styled.div`
