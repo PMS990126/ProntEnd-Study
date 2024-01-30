@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import React from 'react';
 import styled from 'styled-components';
 
-function Nav() {
+export default function Nav() {
     return (
         <Container>
             <Navbar>
@@ -25,7 +25,7 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
+    width: 100vw;
     padding: 7px 0px;
 `;
 
@@ -46,5 +46,3 @@ const Navi = styled(NavLink)`
         text-decoration: underline;
     }
 `;
-
-export default Nav;

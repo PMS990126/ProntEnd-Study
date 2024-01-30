@@ -9,9 +9,8 @@ import Main from './component/Main';
 import Percentage from './component/Percentage';
 import Ranking from './component/Ranking';
 import Footer from './component/Footer';
-import bgImg1 from './picture/Elluel.png';
-import bgImg2 from './picture/Ellev.png';
-import bgImg3 from './picture/Arcana.png';
+import CharacterPage from './component/CharacterPage';
+import backgroundImage from './picture/Elluel.png';
 
 function App() {
     return (
@@ -19,27 +18,30 @@ function App() {
             <Container>
                 <Header />
                 <Nav />
-                <Container>
+                <InsideContainer>
                     <Routes>
                         <Route path="/" element={<Main />} />
                         <Route path="/Ranking" element={<Ranking />} />
                         <Route path="/Percentage" element={<Percentage />} />
+                        <Route path="/u/:character_name" element={<CharacterPage />} />
                     </Routes>
-                </Container>
+                </InsideContainer>
                 <Footer />
             </Container>
         </BrowserRouter>
     );
 }
-
-const backgroundArr=[bgImg1,bgImg2,bgImg3];
-const randomIndex=Math.floor(Math.random()*backgroundArr.length);
-const backgroundImage=backgroundArr[randomIndex];
-
 const Container = styled.div`
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 `;
-
+const InsideContainer = styled.div`
+    width: 100vw;
+    height: 100vh;
+    // background: url(${backgroundImage});
+    // background-repeat: no-repeat;
+    // background-size: cover;
+    // flex-grow: 1;
+`;
 export default App;

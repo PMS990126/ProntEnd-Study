@@ -18,7 +18,7 @@ const Container = styled.div`
     justify-content: center;
     align-items: center;
     padding: 6px;
-    width: 100%;
+    width: 100vw;
     line-height: 1.5;
     a {
         text-decoration: none;
