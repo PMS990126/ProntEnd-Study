@@ -7,7 +7,6 @@ import bgImg2 from '../picture/Ellev.png';
 import bgImg3 from '../picture/Arcana.png';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { useParams } from 'react-router-dom';
 
 export default function Main() {
     return (
@@ -94,6 +93,8 @@ const TitleText = styled.div`
     font-size: 40px;
     font-family: Maplestory Bold;
     margin-left: 10px;
+    align-items: center;
+    justify-content: center;
 `;
 
 const TitleImage = styled.img`
