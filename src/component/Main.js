@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom';
 export default function Main() {
     return (
         <MainContainer>
-            <TitleContainer to={'/'}>
+            <TitleContainer href="/">
                 <TitleImage src={mushroomImage} alt="Orange Mushroom" />
                 <TitleText>maple.GG</TitleText>
             </TitleContainer>
@@ -69,8 +69,8 @@ const MainContainer = styled.div`
     justify-content: center;
     flex-direction: column;
     position: relative;
-    width: 100vw;
-    height:100vh;
+    width: 100%;
+    height:100%;
     margin: 0 auto;
     background: url(${backgroundImage});
     background-repeat: no-repeat;
@@ -79,7 +79,7 @@ const MainContainer = styled.div`
     flex-grow: 1;
 `;
 
-const TitleContainer = styled(NavLink)`
+const TitleContainer = styled.a`
     padding: 80px 20px 0px;
     display: flex;
     align-items: center;
@@ -93,8 +93,6 @@ const TitleText = styled.div`
     font-size: 40px;
     font-family: Maplestory Bold;
     margin-left: 10px;
-    align-items: center;
-    justify-content: center;
 `;
 
 const TitleImage = styled.img`

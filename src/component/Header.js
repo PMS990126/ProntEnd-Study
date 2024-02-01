@@ -5,9 +5,9 @@ import styled from 'styled-components';
 export default function Header() {
     return (
         <Container>
-            <NavLink to="/">
+            <a href="/">
                 <HeaderText>MAPLE.GG</HeaderText>
-            </NavLink>
+            </a>
         </Container>
     );
 }
@@ -17,8 +17,8 @@ const Container = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 6px;
-    width: 100vw;
+    padding: 6px 0px;
+    width: 100%;
     line-height: 1.5;
     a {
         text-decoration: none;

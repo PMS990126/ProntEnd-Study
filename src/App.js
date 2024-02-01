@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import * as react from 'react';
 import styled from 'styled-components';
 import './App.css';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './component/Header';
 import Nav from './component/Nav';
@@ -23,7 +24,7 @@ function App() {
                         <Route path="/" element={<Main />} />
                         <Route path="/Ranking" element={<Ranking />} />
                         <Route path="/Percentage" element={<Percentage />} />
-                        <Route path="/u/:character_name" element={<CharacterPage />} />
+                        <Route path="/u/:ocid" element={<CharacterPage />} />
                     </Routes>
                 </InsideContainer>
                 <Footer />
@@ -37,11 +38,7 @@ const Container = styled.div`
     min-height: 100vh;
 `;
 const InsideContainer = styled.div`
-    width: 100vw;
+    width: 100%;
     height: 100vh;
-    // background: url(${backgroundImage});
-    // background-repeat: no-repeat;
-    // background-size: cover;
-    // flex-grow: 1;
 `;
 export default App;
