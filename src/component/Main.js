@@ -23,7 +23,6 @@ export default function Main() {
 function SearchCharacter() {
     const [searchTerm, setSearchTerm] = useState('');
     const navigate = useNavigate();
-    const today = new Date();
 
     const handleChange = (e) => {
         setSearchTerm(e.target.value);
