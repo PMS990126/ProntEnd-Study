@@ -1,52 +1,107 @@
-import React from 'react';
-import mushroomImage from '../picture/Orange_Mushroom.png'; // 이미지 불러오기
-import backgroundImage from '../picture/Lecheln.jfif'; // 백그라운드 이미지 불러오기
+import {useState, React} from 'react';
+import "./Component.css";
+import styled from 'styled-components';
+import slime from "../picture/slime.png";
+import backgroundImage from "../picture/perion.png";
+import { NavLink, useNavigate } from 'react-router-dom';
 
-function Main() {
+
+export default function Main() {
+
+    const Navigate = useNavigate();
+
+    const [input, setInput] = useState("");
+
+    const handleSearch = (event) => {
+        event.preventDefault();
+        Navigate(`/SearchPage?input=${input}`);
+    };
+
     return (
-        <div className="search">
-            <div className="title">
-                <img src={mushroomImage} alt="Orange Mushroom" />
-                <h1 className="Maplestory Bold">MAPLE.GG</h1>
-            </div>
-            <div className="search">
-                <input type="text" placeholder="캐릭터 또는 길드명을 입력하세요." />
-                <img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png" alt="Search" />
-            </div>
-        </div>
+        <MainContainer>
+            <TitleContainer to = {'/'}>
+                <TitleImage src = {slime} alt = "slime" />
+                <TitleText>MAPLE.GG</TitleText>
+            </TitleContainer>
+            <SearchContainer onSubmit={handleSearch}>
+                <SearchBar value={input} onChange={setInput = event => (event.target.value)} placeholder="캐릭터명을 입력하세요." />
+                <SearchButton type="submit">검색</SearchButton>
+            </SearchContainer>
+        </MainContainer>
     );
 }
 
-// function Main() {
-//     const [search, setSearch] = useState('');
-//     const [characters,  setCharacters] = useState([
-//         // 가상의 캐릭터 데이터
-//         // { nickname: 'Hero' },
-//         // { nickname: 'Warrior' },
-//         // { nickname: 'Magician' }
-//     ]);
 
-//     const onChange = (e) => {
-//         setSearch(e.target.value);
-//     };
 
-//     const filterCharacters = characters.filter((character) => {
-//         return character.nickname.toLowerCase().includes(search.toLowerCase());
-//     });
 
-//     return (
-//         <div className="search">
-//             <h1 className="title Maplestory Bold">
-//                 <img src="ProntEnd-Study/my-toy-project/src/picture/Orange_Mushroom.png" />
-//                 maple.GG
-//             </h1>
-//             <input type="text" value={search} onChange={onChange} placeholder="캐릭터 또는 길드명을 입력하세요."/>
-//             <img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png" />
-//             {filterCharacters.map((character, index) => (
-//                 <p key={index}>{character.nickname}</p>
-//             ))}
-//         </div>
-//     );
-// }
+const MainContainer = styled.div`
+    display: flex;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    justify-content: center;
+    position: relative;
+    flex-direction: column-reverse;
+    background: url(${backgroundImage});
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    margin: 0 auto;
+`;
 
-export default Main;
+const TitleContainer = styled(NavLink)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    cursor: pointer;
+`;
+
+const TitleImage = styled.img`
+    width: 50px;
+    height: 50px;
+
+`;
+
+const TitleText = styled.div`
+    font-size: 60px;
+    font-family: Maplestory Bold;
+    
+    align-items: center;
+    justify-content: center;
+    color: black;
+`;
+
+const SearchContainer = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+`;
+
+const SearchBar = styled.input`
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 8px;
+`;
+
+const SearchButton = styled.button`
+    padding: 8px 16px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+`;
+
+//<div className="search" style={backgroundStyle}>
+//            <div className="title">
+//                <img src = {slime} alt = "slime" className="logo" />
+//               <h1 className="Maplestory Bold">MAPLE.GG</h1>
+//            </div>
+//            <div className="search">
+//                <input type="text" placeholder="캐릭터 또는 길드명을 입력하세요." />
+//                <img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png" alt="Search" />
+//            </div>
+//        </div>
