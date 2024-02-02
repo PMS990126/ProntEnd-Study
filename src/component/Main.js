@@ -1,4 +1,4 @@
-import {useState, React} from 'react';
+import React, { useState } from 'react';
 import "./Component.css";
 import styled from 'styled-components';
 import slime from "../picture/slime.png";
@@ -95,13 +95,3 @@ const SearchButton = styled.button`
     cursor: pointer;
 `;
 
-//<div className="search" style={backgroundStyle}>
-//            <div className="title">
-//                <img src = {slime} alt = "slime" className="logo" />
-//               <h1 className="Maplestory Bold">MAPLE.GG</h1>
-//            </div>
-//            <div className="search">
-//                <input type="text" placeholder="캐릭터 또는 길드명을 입력하세요." />
-//                <img src="https://s3.ap-northeast-2.amazonaws.com/cdn.wecode.co.kr/icon/search.png" alt="Search" />
-//            </div>
-//        </div>
