@@ -15,7 +15,10 @@ export default function Home() {
     const navigate = useNavigate(); // 페이지 이동 훅 
 
     const today = new Date(); // 오늘 날짜 가져오기
-    const dateString = `${today.getFullYear()}-${today.getMonth()+1}-${today.getDate()}`; // 날짜를 문자열로 변환
+    today.setDate(today.getDate() - 1); // 하루 전 날짜로 설정
+    const month = (today.getMonth() + 1).toString().padStart(2, '0'); // 월을 문자열로 변환 및 한 자릿수일 경우 앞에 0 붙이기
+    const date = today.getDate().toString().padStart(2, '0'); // 일을 문자열로 변환 및 한 자릿수일 경우 앞에 0 붙이기
+    const dateString = `${today.getFullYear()}-${month}-${date}`; // 날짜를 문자열로 변환
 
     const [input, setInput] = useState(""); // 사용자의 입력값 관리
 

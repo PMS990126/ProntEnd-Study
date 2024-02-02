@@ -5,6 +5,7 @@ import Header from "./components/header.js";
 import NavBar from "./components/navBar.js";
 import Footer from "./components/footer.js";
 import Home from "./components/home.js";
+import SearchPage from "./components/searchPage.js";
 
 function App() {
     return(
@@ -15,6 +16,7 @@ function App() {
                 <InsideContainer>
                     <Routes>
                         <Route path="/Home" element={<Home />} />
+                        <Route path="/searchPage" element={<SearchPage />} />
                     </Routes>
                 </InsideContainer>
                 <Footer/>
