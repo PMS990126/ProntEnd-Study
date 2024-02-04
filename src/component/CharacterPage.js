@@ -17,6 +17,10 @@ import Red from '../picture/Red.png';
 import Scania from '../picture/Scania.png';
 import Union from '../picture/Union.png';
 import Zenith from '../picture/Zenith.png';
+import StatEquip from './StatEquip';
+import Union_Artifact from './Union';
+import SkillSymbol from './SkillSymbol';
+import MainSub from './MainSub';
 
 const worldMark = {
     아케인: Arcane,
@@ -43,6 +47,8 @@ export default function CharacterPage() {
     const [popularityData, setPopularityData] = useState(null); //캐릭터의 인기도를 저장하는 상태
     const [cashData, setCashData] = useState(null);
     const [worldName, setWorldName] = useState(null);
+    const [guildName, setGuildName] = useState(null);
+    const [guildOcid, setGuildOcid] = useState(null);
 
     const [cashCap, setCashCap] = useState(null); // 캐릭터 캐시 모자
     const [cashTop, setCashTop] = useState(null); // 캐릭터 캐시 상의
@@ -57,15 +63,27 @@ export default function CharacterPage() {
 
     const today = new Date();
     const yesterday = new Date(today.getTime());
-    yesterday.setDate(yesterday.getDate() - 1);
+    yesterday.setDate(yesterday.getDate() - 2);
     const year = yesterday.getFullYear();
     const month = ('0' + (yesterday.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 1을 더해줍니다.
     const date = ('0' + yesterday.getDate()).slice(-2); // 날짜를 2자리로 만듭니다.
     const usingday = `${year}-${month}-${date}`;
 
     const [activeTab, setActiveTab] = useState('statEquip');
-    const handleTabClick = (tabName) => {
-        setActiveTab(tabName);
+
+    const renderInformationContainer = () => {
+        switch (activeTab) {
+            case 'statEquip':
+                return <StatEquip />;
+            case 'union':
+                return <Union_Artifact />;
+            case 'skillSymbol':
+                return <SkillSymbol />;
+            case 'mainSub':
+                return <MainSub />;
+            default:
+                return <StatEquip />;
+        }
     };
 
     useEffect(() => {
@@ -189,64 +207,76 @@ export default function CharacterPage() {
 
     return (
         <PageContainer>
-            <CharacterContainer>
-                <CashItemContainer>
-                    <div>모자 : {cashCap}</div>
-                    <div>헤어 : {characterHair}</div>
-                    <div>성형 : {characterFace}</div>
-                    <div>상의 : {cashTop}</div>
-                    <div>하의 : {cashBottom}</div>
-                    <div>신발 : {cashShoes}</div>
-                    <div>무기 : {cashWeapon}</div>
-                </CashItemContainer>
+            <BgImgContainer>
+                <CharacterContainer>
+                    <CashItemContainer>
+                        <div>모자 : {cashCap}</div>
+                        <div>헤어 : {characterHair}</div>
+                        <div>성형 : {characterFace}</div>
+                        <div>상의 : {cashTop}</div>
+                        <div>하의 : {cashBottom}</div>
+                        <div>신발 : {cashShoes}</div>
+                        <div>무기 : {cashWeapon}</div>
+                    </CashItemContainer>
 
-                <CharacterImageContainer>
-                    <CharacterImage src={characterData.character_image} alt="ct" />
-                    <div>조회 기준일 : {usingday}</div>
-                </CharacterImageContainer>
+                    <CharacterImageContainer>
+                        <CharacterImage src={characterData.character_image} alt="ct" />
+                        <div>조회 기준일 : {usingday}</div>
+                    </CharacterImageContainer>
 
-                <CharacterInfoContainer>
-                    <CharacterName>
-                        {characterData.character_name} | <WorldImg worldName={characterData.world_name}></WorldImg>
-                        {characterData.world_name}
-                    </CharacterName>
-                    <CharacterDetail>
-                        Lv: {characterData.character_level} | {characterData.character_class} | 인기도 {popularityData.popularity} | {characterData.character_guild_name}
-                    </CharacterDetail>
-                    <CharacterDetail>
-                        <ResetBt
-                            onClick={() => {
-                                fetchCharacterData(ocid);
-                                fetchCharacterPopularityData(ocid);
-                                fetchCharacterCashitemEquipmentData(ocid);
-                            }}
-                        >
-                            정보 갱신
-                        </ResetBt>
-                    </CharacterDetail>
-                </CharacterInfoContainer>
-            </CharacterContainer>
-            <InformationContainer>
-                <button onClick={() => handleTabClick('statEquip')}>스탯장비</button>
-                <button onClick={() => handleTabClick('union')}>유니온</button>
-                <button onClick={() => handleTabClick('skillSymbol')}>스킬및심볼</button>
-                <button onClick={() => handleTabClick('mainSub')}>본캐/부캐</button>
-            </InformationContainer>
+                    <CharacterInfoContainer>
+                        <CharacterName>
+                            {characterData.character_name} | <WorldImg worldName={characterData.world_name}></WorldImg>
+                            {characterData.world_name}
+                        </CharacterName>
+                        <CharacterDetail>
+                            Lv: {characterData.character_level} | {characterData.character_class} | 인기도 {popularityData.popularity} | {characterData.character_guild_name}
+                        </CharacterDetail>
+                        <CharacterDetail>
+                            <ResetBt
+                                onClick={() => {
+                                    fetchCharacterData(ocid);
+                                    fetchCharacterPopularityData(ocid);
+                                    fetchCharacterCashitemEquipmentData(ocid);
+                                }}
+                            >
+                                정보 갱신
+                            </ResetBt>
+                        </CharacterDetail>
+                    </CharacterInfoContainer>
+                </CharacterContainer>
+            </BgImgContainer>
+            <ImformationContainer>
+                <TabMenuBar>
+                    <TabMenuBt onClick={() => setActiveTab('statEquip')}>스탯장비</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('union')}>유니온</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('skillSymbol')}>스킬 및 심볼</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('mainSub')}>본캐/부캐</TabMenuBt>
+                </TabMenuBar>
+                <UnderContainer>{renderInformationContainer()}</UnderContainer>
+            </ImformationContainer>
         </PageContainer>
     );
 }
 const PageContainer = styled.div`
-    display: flex;
+    background-color: rgba(33, 34, 39);
     flex-dirction: column;
 `;
-const CharacterContainer = styled.div`
-    margin: 0;
-    padding: 80px 0px 40px 30%;
-    display: flex;
+
+const BgImgContainer = styled.div`
     background: url(${bgImg});
     background-size: cover;
+    height: 100%;
+`;
+
+const CharacterContainer = styled.div`
+    margin-left: 22%;
+    margin-right: 22%;
+    padding: 80px 0 40px 20px;
+    display: flex;
     color: white;
-    width: 100%;
+    max-width: 100%;
+    height: 100%;
 `;
 
 const CharacterInfoContainer = styled.div`
@@ -267,7 +297,7 @@ const CashItemContainer = styled.div`
     background-color: rgba(55, 55, 55, 0.7);
     color: white;
     padding: 5px;
-    width: 130px;
+    width: 140px;
     border-radius: 10px;
     font-size: 12px;
     overflow: hidden;
@@ -336,4 +366,40 @@ const WorldImg = styled.div`
     margin-right: 5px;
 `;
 
-const InformationContainer = styled.div``;
+const ImformationContainer = styled.div`
+    background-color: #f8f9fa;
+    padding: 20px;
+    flex-grow: 1;
+    height: 100%;
+`;
+
+const TabMenuBar = styled.div`
+    background-color: white;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border: solid 1px #ced4da;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    margin-left: 22%;
+    margin-right: 22%;
+`;
+
+const TabMenuBt = styled.button`
+    background-color: white;
+    border: none;
+    border-right: solid 1px #ced4da;
+    width: 100px;
+    height: 40px;
+    margin-left: 15px;
+    padding-right: 15px;
+    justify-content: left;
+`;
+const UnderContainer = styled.div`
+    border-right: solid 1px #ced4da;
+    background-color: white;
+    border-radius: 15px;
+    margin-left: 22%;
+    margin-right: 22%;
+    padding: 20px;
+`;

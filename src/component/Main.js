@@ -7,7 +7,6 @@ import bgImg2 from '../picture/Ellev.png';
 import bgImg3 from '../picture/Arcana.png';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-
 export default function Main() {
     return (
         <MainContainer>
@@ -69,13 +68,12 @@ const MainContainer = styled.div`
     flex-direction: column;
     position: relative;
     width: 100%;
-    height:100%;
+    height:100vh;
     margin: 0 auto;
     background: url(${backgroundImage});
     background-repeat: no-repeat;
     background-size: cover;
-    background-position:center;
-    
+    background-position:center;   
 `;
 
 const TitleContainer = styled.a`
@@ -89,7 +87,7 @@ const TitleContainer = styled.a`
 
 const TitleText = styled.div`
     color: black;
-    font-size: 40px;
+    font-size: 50px;
     font-family: Maplestory Bold;
     margin-left: 10px;
 `;
@@ -110,17 +108,17 @@ const SearchContainer = styled.form`
 
 const SearchBar = styled.input`
     width: 100%;
-    max-width: 300px;
+    max-width: 20%;
     border: 1px solid #bbb;
     border-radius: 8px;
     padding: 10px 12px;
-    font-size: 14px;
+    font-size: 16px;
 `;
 
 const SearchImage = styled.img`
     position: relative;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     top: 50%;
     right: 30px;
     margin: 0;

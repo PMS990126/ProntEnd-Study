@@ -39,6 +39,6 @@ const Container = styled.div`
     min-height: 100vh;
 `;
 const InsideContainer = styled.div`
-    height: 100vh;
+    flex-grow: 1;
 `;
 export default App;
