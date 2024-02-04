@@ -1,32 +1,78 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
+import axios from 'axios';
 import loading from '../picture/주황버섯점프.gif';
 import bgImg from '../picture/별삼심.png';
+import Arcane from '../picture/Arcane.png';
+import Aurora from '../picture/Aurora.png';
+import Bera from '../picture/Bera.png';
+import Croa from '../picture/Croa.png';
+import Elysium from '../picture/Elysium.png';
+import Enosis from '../picture/Enosis.png';
+import Luna from '../picture/Luna.png';
+import Nova from '../picture/Nova.png';
+import Reboot from '../picture/Reboot.png';
+import Red from '../picture/Red.png';
+import Scania from '../picture/Scania.png';
+import Union from '../picture/Union.png';
+import Zenith from '../picture/Zenith.png';
 
+const worldMark = {
+    아케인: Arcane,
+    오로라: Aurora,
+    베라: Bera,
+    크로아: Croa,
+    엘리시움: Elysium,
+    이노시스: Enosis,
+    루나: Luna,
+    노바: Nova,
+    리부트: Reboot,
+    레드: Red,
+    스카니아: Scania,
+    유니온: Union,
+    제니스: Zenith,
+};
 export default function CharacterPage() {
+    const maple_api = process.env.REACT_APP_NEXON_OPEN_API;
+
     let currentPath = window.location.pathname;
     let parts = currentPath.split('/');
     let ocid = parts[2]; //URL의 파리미터에서 ocid(식별자)를 가져옴
     const [characterData, setCharacterData] = useState(null); //캐릭터의 데이터를 저장하는 상태
     const [popularityData, setPopularityData] = useState(null); //캐릭터의 인기도를 저장하는 상태
     const [cashData, setCashData] = useState(null);
+    const [worldName, setWorldName] = useState(null);
+
+    const [cashCap, setCashCap] = useState(null); // 캐릭터 캐시 모자
+    const [cashTop, setCashTop] = useState(null); // 캐릭터 캐시 상의
+    const [cashBottom, setCashBottom] = useState(null); // 캐릭터 캐시 하의
+    const [cashShoes, setCashShoes] = useState(null); // 캐릭터 캐시 신발
+    const [cashWeapon, setCashWeapon] = useState(null); // 캐릭터 캐시 무기
+
+    const [characterHair, setCharacterHair] = useState(null); //캐릭터 헤어
+    const [characterFace, setCharacterFace] = useState(null); //캐릭터 성형
+
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태를 나타내는 상태 변수
 
     const today = new Date();
     const yesterday = new Date(today.getTime());
-
     yesterday.setDate(yesterday.getDate() - 1);
-
     const year = yesterday.getFullYear();
     const month = ('0' + (yesterday.getMonth() + 1)).slice(-2); // 월은 0부터 시작하므로 1을 더해줍니다.
     const date = ('0' + yesterday.getDate()).slice(-2); // 날짜를 2자리로 만듭니다.
     const usingday = `${year}-${month}-${date}`;
 
+    const [activeTab, setActiveTab] = useState('statEquip');
+    const handleTabClick = (tabName) => {
+        setActiveTab(tabName);
+    };
+
     useEffect(() => {
         fetchCharacterData(ocid); //식별자를 이용해 캐릭터 데이터 불러오기
         fetchCharacterPopularityData(ocid); //식별자를 이용해 캐릭터 인기도 불러오기
         fetchCharacterCashitemEquipmentData(ocid);
+        fetchCharacterBeautyData(ocid);
     }, [ocid]);
 
     useEffect(() => {
@@ -37,7 +83,6 @@ export default function CharacterPage() {
     }, []);
 
     const fetchCharacterData = (ocid) => {
-        const maple_api = process.env.REACT_APP_NEXON_OPEN_API;
         fetch(`https://open.api.nexon.com/maplestory/v1/character/basic?ocid=${ocid}&date=${usingday}`, {
             method: 'GET',
             headers: {
@@ -54,7 +99,6 @@ export default function CharacterPage() {
     };
 
     const fetchCharacterPopularityData = (ocid) => {
-        const maple_api = process.env.REACT_APP_NEXON_OPEN_API;
         fetch(`https://open.api.nexon.com/maplestory/v1/character/popularity?ocid=${ocid}&date=${usingday}`, {
             method: 'GET',
             headers: {
@@ -71,7 +115,6 @@ export default function CharacterPage() {
     };
 
     const fetchCharacterCashitemEquipmentData = (ocid) => {
-        const maple_api = process.env.REACT_APP_NEXON_OPEN_API;
         fetch(`https://open.api.nexon.com/maplestory/v1/character/cashitem-equipment?ocid=${ocid}&date=${usingday}`, {
             method: 'GET',
             headers: {
@@ -83,6 +126,54 @@ export default function CharacterPage() {
             .then((data) => {
                 setCashData(data.cash_item_equipment_preset_1); //불러온 데이터를 상태에 저장
                 setIsLoading(false); // 데이터를 불러온 후 로딩 상태를 false로 설정
+
+                data.cash_item_equipment_base.forEach((item) => {
+                    switch (item.cash_item_equipment_slot) {
+                        case '모자':
+                            setCashCap(item.cash_item_name);
+                            break;
+                        case '상의':
+                            setCashTop(item.cash_item_name);
+                            if (item.cash_item_equipment_part === '한벌옷') {
+                                setCashBottom('-');
+                            }
+                            break;
+                        case '하의':
+                            setCashBottom(item.cash_item_name);
+                            break;
+                        case '신발':
+                            setCashShoes(item.cash_item_name);
+                            break;
+                        case '무기':
+                            setCashWeapon(item.cash_item_name);
+                            break;
+                        default:
+                            break;
+                    }
+                });
+            })
+            .catch((error) => console.error('Error:', error));
+    };
+
+    const fetchCharacterBeautyData = (ocid) => {
+        fetch(`https://open.api.nexon.com/maplestory/v1/character/beauty-equipment?ocid=${ocid}&date=${usingday}`, {
+            method: 'GET',
+            headers: {
+                accept: 'application/json',
+                'x-nxopen-api-key': maple_api,
+            },
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                setPopularityData(data); // 불러온 데이터를 상태에 저장
+                setIsLoading(false); // 데이터를 불러온 후 로딩 상태를 false로 설정
+
+                const {
+                    character_hair: { hair_name },
+                    character_face: { face_name },
+                } = data;
+                setCharacterHair(hair_name);
+                setCharacterFace(face_name);
             })
             .catch((error) => console.error('Error:', error));
     };
@@ -91,62 +182,71 @@ export default function CharacterPage() {
         return (
             <TitleText>
                 <LoadingImg src={loading} alt="loading" />
-                Loading...
+                Loading...{usingday}
             </TitleText>
         ); // 로딩 중일 때는 "Loading..." 메시지를 표시
     }
 
     return (
-        <CharacterContainer>
-            <CashItemContainer>
-                {cashData.map((item, index) => (
-                    <div key={index}>
-                        <span>
-                            {item.cash_item_equipment_part} : {item.cash_item_name}
-                        </span>
-                        {/* <img src={item.cash_item_icon} alt={item.cash_item_name} /> */}
-                    </div>
-                ))}
-            </CashItemContainer>
+        <PageContainer>
+            <CharacterContainer>
+                <CashItemContainer>
+                    <div>모자 : {cashCap}</div>
+                    <div>헤어 : {characterHair}</div>
+                    <div>성형 : {characterFace}</div>
+                    <div>상의 : {cashTop}</div>
+                    <div>하의 : {cashBottom}</div>
+                    <div>신발 : {cashShoes}</div>
+                    <div>무기 : {cashWeapon}</div>
+                </CashItemContainer>
 
-            <CharacterImageContainer>
-                <CharacterImage src={characterData.character_image} alt="ct" />
-                <div>조회 기준일 : {usingday}</div>
-            </CharacterImageContainer>
+                <CharacterImageContainer>
+                    <CharacterImage src={characterData.character_image} alt="ct" />
+                    <div>조회 기준일 : {usingday}</div>
+                </CharacterImageContainer>
 
-            <CharacterInfoContainer>
-                <CharacterName>
-                    {characterData.character_name} | {characterData.world_name}
-                </CharacterName>
-                <CharacterDetail>
-                    Lv: {characterData.character_level} | {characterData.character_class} | 인기도 {popularityData.popularity} | {characterData.character_guild_name}
-                </CharacterDetail>
-                <CharacterDetail>
-                    <ResetBt
-                        onClick={() => {
-                            fetchCharacterData(ocid);
-                            fetchCharacterPopularityData(ocid);
-                            fetchCharacterCashitemEquipmentData(ocid);
-                        }}
-                    >
-                        정보 갱신
-                    </ResetBt>
-                </CharacterDetail>
-            </CharacterInfoContainer>
-        </CharacterContainer>
+                <CharacterInfoContainer>
+                    <CharacterName>
+                        {characterData.character_name} | <WorldImg worldName={characterData.world_name}></WorldImg>
+                        {characterData.world_name}
+                    </CharacterName>
+                    <CharacterDetail>
+                        Lv: {characterData.character_level} | {characterData.character_class} | 인기도 {popularityData.popularity} | {characterData.character_guild_name}
+                    </CharacterDetail>
+                    <CharacterDetail>
+                        <ResetBt
+                            onClick={() => {
+                                fetchCharacterData(ocid);
+                                fetchCharacterPopularityData(ocid);
+                                fetchCharacterCashitemEquipmentData(ocid);
+                            }}
+                        >
+                            정보 갱신
+                        </ResetBt>
+                    </CharacterDetail>
+                </CharacterInfoContainer>
+            </CharacterContainer>
+            <InformationContainer>
+                <button onClick={() => handleTabClick('statEquip')}>스탯장비</button>
+                <button onClick={() => handleTabClick('union')}>유니온</button>
+                <button onClick={() => handleTabClick('skillSymbol')}>스킬및심볼</button>
+                <button onClick={() => handleTabClick('mainSub')}>본캐/부캐</button>
+            </InformationContainer>
+        </PageContainer>
     );
 }
-
+const PageContainer = styled.div`
+    display: flex;
+    flex-dirction: column;
+`;
 const CharacterContainer = styled.div`
     margin: 0;
     padding: 80px 0px 40px 30%;
     display: flex;
-    flex-direction: row;
-    flex-grow: 1;
     background: url(${bgImg});
     background-size: cover;
-    backgroun-position: top center;
     color: white;
+    width: 100%;
 `;
 
 const CharacterInfoContainer = styled.div`
@@ -182,6 +282,7 @@ const CharacterImage = styled.img`
 `;
 
 const CharacterName = styled.div`
+    align-items: center;
     font-size: 20px;
     flex-direction: row;
     display: flex;
@@ -206,7 +307,6 @@ const LoadingImg = styled.img`
 
 const CharacterDetail = styled.div`
     margin: 20px 0;
-    width: 100%;
 `;
 const ResetBt = styled.button`
     margin: 10px 0;
@@ -227,3 +327,13 @@ const ResetBt = styled.button`
         background: #87dbae;
     }
 `;
+
+const WorldImg = styled.div`
+    background-image: url(${(probs) => worldMark[probs.worldName]});
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+`;
+
+const InformationContainer = styled.div``;

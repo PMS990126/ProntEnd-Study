@@ -12,6 +12,7 @@ import Ranking from './component/Ranking';
 import Footer from './component/Footer';
 import CharacterPage from './component/CharacterPage';
 import backgroundImage from './picture/Elluel.png';
+import Test from './component/Test';
 
 function App() {
     return (
@@ -38,7 +39,6 @@ const Container = styled.div`
     min-height: 100vh;
 `;
 const InsideContainer = styled.div`
-    width: 100%;
     height: 100vh;
 `;
 export default App;

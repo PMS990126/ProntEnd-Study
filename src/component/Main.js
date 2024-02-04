@@ -75,7 +75,7 @@ const MainContainer = styled.div`
     background-repeat: no-repeat;
     background-size: cover;
     background-position:center;
-    flex-grow: 1;
+    
 `;
 
 const TitleContainer = styled.a`
