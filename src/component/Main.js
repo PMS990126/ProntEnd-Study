@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import React from 'react';
 import "./Component.css";
 import styled from 'styled-components';
 import slime from "../picture/slime.png";
@@ -6,16 +7,20 @@ import backgroundImage from "../picture/perion.png";
 import { NavLink, useNavigate } from 'react-router-dom';
 
 
-export default function Main() {
+function Main() {
 
-    const Navigate = useNavigate();
-
-    const [input, setInput] = useState("");
+    const navigate = useNavigate();
+    const [searchQuery, setSearchQuery] = useState("");
+    const today = new Date(); 
+    today.setDate(today.getDate() - 1); 
+    const month = (today.getMonth() + 1).toString().padStart(2, '0');
+    const date = today.getDate().toString().padStart(2, '0'); 
+    const dateString = `${today.getFullYear()}-${month}-${date}`;
 
     const handleSearch = (event) => {
         event.preventDefault();
-        Navigate(`/SearchPage?input=${input}`);
-    };
+        navigate(`/SearchPage?date=${dateString}&input=${searchQuery}`);
+    }
 
     return (
         <MainContainer>
@@ -24,13 +29,14 @@ export default function Main() {
                 <TitleText>MAPLE.GG</TitleText>
             </TitleContainer>
             <SearchContainer onSubmit={handleSearch}>
-                <SearchBar value={input} onChange={setInput = event => (event.target.value)} placeholder="캐릭터명을 입력하세요." />
+                <SearchBar type="text" value={searchQuery} onChange={event => setSearchQuery(event.target.value)} placeholder="캐릭터명 또는 길드명을 입력하세요." />
                 <SearchButton type="submit">검색</SearchButton>
             </SearchContainer>
         </MainContainer>
     );
 }
 
+export default Main;
 
 
 
@@ -39,9 +45,9 @@ const MainContainer = styled.div`
     align-items: center;
     width: 100vw;
     height: 100vh;
-    justify-content: center;
+    justify-content: flex-start;
     position: relative;
-    flex-direction: column-reverse;
+    flex-direction: column;
     background: url(${backgroundImage});
     background-repeat: no-repeat;
     background-size: cover;
@@ -55,6 +61,7 @@ const TitleContainer = styled(NavLink)`
     justify-content: center;
     text-decoration: none;
     cursor: pointer;
+    margin-top: 20vh;
 `;
 
 const TitleImage = styled.img`
@@ -73,14 +80,13 @@ const TitleText = styled.div`
 `;
 
 const SearchContainer = styled.div`
-    display: flex;
     align-items: center;
-    justify-content: center;    
+    justify-content: space-around;
+    flex-direction: column;  
 `;
 
 const SearchBar = styled.input`
-    flex: 1;
-    padding: 8px;
+    padding: 8px 60px;
     border: 1px solid #ccc;
     border-radius: 4px;
     margin-right: 8px;
