@@ -19,6 +19,7 @@ function App() {
                     <Route path="/" element={<Main />} />
                     <Route path="/Ranking" element={<Ranking />} />
                     <Route path="/Percentage" element={<Percentage />} />
+                    <Route path="/SearchPage" element={<SearchPage />} />
                     
                 </Routes>
                 <Footer />

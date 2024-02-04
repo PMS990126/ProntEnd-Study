@@ -22,6 +22,10 @@ function Main() {
         navigate(`/SearchPage?date=${dateString}&input=${searchQuery}`);
     }
 
+    const handleChange = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
     return (
         <MainContainer>
             <TitleContainer to = {'/'}>
@@ -29,7 +33,7 @@ function Main() {
                 <TitleText>MAPLE.GG</TitleText>
             </TitleContainer>
             <SearchContainer onSubmit={handleSearch}>
-                <SearchBar type="text" value={searchQuery} onChange={event => setSearchQuery(event.target.value)} placeholder="캐릭터명 또는 길드명을 입력하세요." />
+                <SearchBar type="text" value={searchQuery} onChange={handleChange} placeholder="캐릭터명 또는 길드명을 입력하세요." />
                 <SearchButton type="submit">검색</SearchButton>
             </SearchContainer>
         </MainContainer>
