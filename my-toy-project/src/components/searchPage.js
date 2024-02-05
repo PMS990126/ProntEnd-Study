@@ -25,6 +25,10 @@ import myeonghun from "../images/myeonghun.png";
 import pangE from "../images/pangE.png";
 import suho from "../images/suho.png";
 import wongi from "../images/wongi.png";
+import Stats_Equipment from "./Stats_Equipment.js";
+import Union_Artifact from "./Union_Artifact.js";
+import Skill_Symbol from "./Skill_Symbol.js";
+import MainChar_SubChar from "./MainChar_SubChar.js";
 
 const worldMark = {
     "아케인" : Arcane,
@@ -49,11 +53,12 @@ export default function SearchPage() {
     const navigate = useNavigate(); // 페이지 이동 훅
     const location = useLocation(); // URL 정보 객체 반환 훅
 
-    const [userInput, setUserInput] = useState(""); // 현재 페이지에서의 사용자 입렵값
+    const [userInput, setUserInput] = useState(""); // 현재 페이지에서의 사용자 입력값
+    const [activeTab, setActiveTab] = useState("Stats_Equipment"); // 렌더링할 컴포넌트를 결정하는 상태 + 초기값은 스탯&장비
 
     const queryParams = new URLSearchParams(location.search);
 
-    const bannerImg = [geulja, myeonghun, pangE, suho, wongi];
+    const bannerImg = [geulja, myeonghun, pangE, suho, wongi]; // 배너 이미지 배열
 
     const charName = queryParams.get("input"); // 검색한 캐릭터 이름 가져오기
     const searchDate = queryParams.get("date"); // 검색한 날짜&시간 가져오기
@@ -177,83 +182,102 @@ export default function SearchPage() {
     }, [charName]);
 
     return (
-        <UserInfoBox>
-            <CashItemBox>
-                <CodyBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>모자 &nbsp;:</CodyParts>
-                        <CodyInfo>{cashCap}</CodyInfo>
-                    </DetailCodyInfoBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>헤어 &nbsp;:</CodyParts>
-                        <CodyInfo>{charHair}</CodyInfo>
-                    </DetailCodyInfoBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>성형 &nbsp;:</CodyParts>
-                        <CodyInfo>{charFace}</CodyInfo>
-                    </DetailCodyInfoBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>상의 &nbsp;:</CodyParts>
-                        <CodyInfo>{cashTop}</CodyInfo>
-                    </DetailCodyInfoBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>하의 &nbsp;:</CodyParts>
-                        <CodyInfo>{cashBottom}</CodyInfo>
-                    </DetailCodyInfoBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>신발 &nbsp;:</CodyParts>
-                        <CodyInfo>{cashShoes}</CodyInfo>
-                    </DetailCodyInfoBox>
-                    <DetailCodyInfoBox>
-                        <CodyParts>무기 &nbsp;:</CodyParts>
-                        <CodyInfo>{cashWeapon}</CodyInfo>
-                    </DetailCodyInfoBox>
-                </CodyBox>
-                <DetailCodyLink>
-                    <NavLink to = "" style = {{textDecoration: 'none', color: 'white'}}>코디 상세 정보 Link</NavLink>
-                </DetailCodyLink>
-            </CashItemBox>
-            <CharImageBox>
-                <CharImage imageUrl = {charImage}></CharImage>
-                <LastActivityDay>마지막 활동일 : {1}일 전</LastActivityDay>
-            </CharImageBox>
-            <CharInfoBox>
-                <NickandWorldBox>
-                    <CharNickname>{charNick}</CharNickname>
-                    <WorldBox>
-                        <WorldIcon worldName = {charWorldName}></WorldIcon>
-                        <WorldName>{charWorldName}</WorldName>
-                    </WorldBox>
-                </NickandWorldBox>
-                <CharDetailInfo>
-                    <LevelandExp>Lv.{charLevel}({Number(charExp).toFixed(2)}%)</LevelandExp>
-                    <Divider>I</Divider>
-                    <CharClass>{charClass}</CharClass>
-                    <Divider>I</Divider>
-                    <CharPop>인기도 {Number(charPop).toLocaleString()}</CharPop>
-                    <Divider>I</Divider>
-                    <GuildBox to="">
-                        <GuildMark guildCustomIcon = {guildCustomMark} guildIcon = {guildMark}></GuildMark>
-                        <GuildName>{charGuildName}</GuildName>
-                    </GuildBox>
-                </CharDetailInfo>
-                <RefreshButton onClick = {fetchUserData}>최신정보로 갱신하기</RefreshButton>
-                <RecentUpdate>최근 정보 갱신일 : {searchDate}</RecentUpdate>
-                <SearchBar onSubmit = {Re_Search}>
-                    <InputField type="text" value = {userInput} onChange = {UserInputChange} placeholder="캐릭터 또는 길드명을 입력하세요."/>
-                    <SearchButton type="submit">검색</SearchButton>
-                </SearchBar>
-            </CharInfoBox>
-            <BannerAd modules = {[Navigation, Pagination]} slidesPerView = {1} pagination={{ clickable: true }} navigation>
-                {bannerImg.map((image, index) => (
-                    <BannerSlide key = {index}>
-                        <SlideImage imageUrl = {image}/>
-                    </BannerSlide>
-                ))}
-            </BannerAd>         
-        </UserInfoBox>
+        <Container>
+            <UserInfoBox>
+                <CashItemBox>
+                    <CodyBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>모자 &nbsp;:</CodyParts>
+                            <CodyInfo>{cashCap}</CodyInfo>
+                        </DetailCodyInfoBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>헤어 &nbsp;:</CodyParts>
+                            <CodyInfo>{charHair}</CodyInfo>
+                        </DetailCodyInfoBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>성형 &nbsp;:</CodyParts>
+                            <CodyInfo>{charFace}</CodyInfo>
+                        </DetailCodyInfoBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>상의 &nbsp;:</CodyParts>
+                            <CodyInfo>{cashTop}</CodyInfo>
+                        </DetailCodyInfoBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>하의 &nbsp;:</CodyParts>
+                            <CodyInfo>{cashBottom}</CodyInfo>
+                        </DetailCodyInfoBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>신발 &nbsp;:</CodyParts>
+                            <CodyInfo>{cashShoes}</CodyInfo>
+                        </DetailCodyInfoBox>
+                        <DetailCodyInfoBox>
+                            <CodyParts>무기 &nbsp;:</CodyParts>
+                            <CodyInfo>{cashWeapon}</CodyInfo>
+                        </DetailCodyInfoBox>
+                    </CodyBox>
+                    <DetailCodyLink>
+                        <NavLink to = "" style = {{textDecoration: 'none', color: 'white'}}>코디 상세 정보 Link</NavLink>
+                    </DetailCodyLink>
+                </CashItemBox>
+                <CharImageBox>
+                    <CharImage imageUrl = {charImage}></CharImage>
+                    <LastActivityDay>마지막 활동일 : {1}일 전</LastActivityDay>
+                </CharImageBox>
+                <CharInfoBox>
+                    <NickandWorldBox>
+                        <CharNickname>{charNick}</CharNickname>
+                        <WorldBox>
+                            <WorldIcon worldName = {charWorldName}></WorldIcon>
+                            <WorldName>{charWorldName}</WorldName>
+                        </WorldBox>
+                    </NickandWorldBox>
+                    <CharDetailInfo>
+                        <LevelandExp>Lv.{charLevel}({Number(charExp).toFixed(2)}%)</LevelandExp>
+                        <Divider>I</Divider>
+                        <CharClass>{charClass}</CharClass>
+                        <Divider>I</Divider>
+                        <CharPop>인기도 {Number(charPop).toLocaleString()}</CharPop>
+                        <Divider>I</Divider>
+                        <GuildBox to="">
+                            <GuildMark guildCustomIcon = {guildCustomMark} guildIcon = {guildMark}></GuildMark>
+                            <GuildName>{charGuildName}</GuildName>
+                        </GuildBox>
+                    </CharDetailInfo>
+                    <RefreshButton onClick = {fetchUserData}>최신정보로 갱신하기</RefreshButton>
+                    <RecentUpdate>최근 정보 갱신일 : {searchDate}</RecentUpdate>
+                    <SearchBar onSubmit = {Re_Search}>
+                        <InputField type="text" value = {userInput} onChange = {UserInputChange} placeholder="캐릭터 또는 길드명을 입력하세요."/>
+                        <SearchButton type="submit">검색</SearchButton>
+                    </SearchBar>
+                </CharInfoBox>
+                <BannerAd modules = {[Navigation, Pagination]} slidesPerView = {1} pagination={{ clickable: true }} navigation>
+                    {bannerImg.map((image, index) => (
+                        <BannerSlide key = {index}>
+                            <SlideImage imageUrl = {image}/>
+                        </BannerSlide>
+                    ))}
+                </BannerAd>         
+            </UserInfoBox>
+            <NaviBar>
+                <NaviButton active = {activeTab === "Stats_Equipment"} onClick = {() => setActiveTab("Stats_Equipment")}>스탯 & 장비</NaviButton>
+                <NaviButton active = {activeTab === "Union_Artifact"} onClick = {() => setActiveTab("Union_Artifact")}>유니온 & 아티팩트</NaviButton>
+                <NaviButton active = {activeTab === "Skill_Symbol"} onClick = {() => setActiveTab("Skill_Symbol")}>스킬 & 심볼</NaviButton>
+                <NaviButton active = {activeTab === "MainChar_SubChar"} onClick = {() => setActiveTab("MainChar_SubChar")}>본캐 & 부캐</NaviButton>
+            </NaviBar>
+            <DetailInfoContainer>
+                {activeTab === "Stats_Equipment" && <Stats_Equipment />}
+                {activeTab === "Union_Artifact" && <Union_Artifact />}
+                {activeTab === "Skill_Symbol" && <Skill_Symbol />}
+                {activeTab === "MainChar_SubChar" && <MainChar_SubChar />}
+            </DetailInfoContainer>
+        </Container>
     );
 }
+
+const Container = styled.div` // 검색 페이지 최상위 부모 컨테이너
+    display: flex; 
+    flex-direction: column;
+`;
 
 const UserInfoBox = styled.div` // 유저 정보 박스의 최상위 컨테이너
     display: flex; 
@@ -504,4 +528,35 @@ const SlideImage = styled.div` // 스와이퍼 슬라이드 내부의 광고 이
     background-size: cover;
     height: 100%;
     width: 100%;
+`;
+
+const NaviBar = styled.div` // 네비바 최상위 컨테이너
+    display: flex; 
+    margin: auto;
+    margin-top: 2.5vh;
+`;
+
+const NaviButton = styled.div` // 네비바 컨테이너 내부의 네비 버튼
+    cursor: pointer;
+    width: 20vw;
+    height: 10vh;
+    border: 1px solid white;
+    border-radius: 15px;
+    font-family: maple-font;
+    font-size: 20px;
+    background-color: ${props => props.active ? "#5CB85C" : "#363944"}; 
+    color: white;
+    text-align: center;
+    line-height: 10vh;
+
+    &:hover {
+        background-color: ${props => props.active ? "#5CB85C" : "#38393D"};
+        color: ${props => props.active ? "white" : "#5CB85C"};
+    }
+`;
+
+const DetailInfoContainer = styled.div` // 캐릭터 상세정보 결과 최상위 컨테이너
+    width: 80vw;
+    margin: auto;
+    margin-top: 2.5vh;
 `;
