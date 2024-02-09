@@ -61,19 +61,18 @@ const randomIndex = Math.floor(Math.random() * backgroundArr.length);
 const backgroundImage = backgroundArr[randomIndex];
 
 const MainContainer = styled.div`
-    padding-top:60px
+    padding-top: 60px;
     display: flex;
     align-items: center;
-    justify-content: center;
     flex-direction: column;
     position: relative;
     width: 100%;
-    height:100vh;
+    height: 100vh;
     margin: 0 auto;
     background: url(${backgroundImage});
     background-repeat: no-repeat;
     background-size: cover;
-    background-position:center;   
+    background-position: center;
 `;
 
 const TitleContainer = styled.a`
@@ -113,13 +112,13 @@ const SearchBar = styled.input`
     border-radius: 8px;
     padding: 10px 12px;
     font-size: 16px;
+    font-family: Cafe24SsurroundAir;
 `;
 
 const SearchImage = styled.img`
     position: relative;
     width: 20px;
     height: 20px;
-    top: 50%;
     right: 30px;
     margin: 0;
     cursor: pointer;

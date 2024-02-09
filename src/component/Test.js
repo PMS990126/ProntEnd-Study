@@ -3,7 +3,7 @@ import { NavLink, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
 import loading from '../picture/주황버섯점프.gif';
-import bgImg from '../picture/별삼심.png';
+import bgImg from '../picture/파르템.png';
 import Arcane from '../picture/Arcane.png';
 import Aurora from '../picture/Aurora.png';
 import Bera from '../picture/Bera.png';
@@ -17,6 +17,10 @@ import Red from '../picture/Red.png';
 import Scania from '../picture/Scania.png';
 import Union from '../picture/Union.png';
 import Zenith from '../picture/Zenith.png';
+import StatEquip from './StatEquip';
+import Union_Artifact from './Union';
+import SkillSymbol from './SkillSymbol';
+import MainSub from './MainSub';
 
 const worldMark = {
     아케인: Arcane,
@@ -59,12 +63,12 @@ export default function CharacterPage() {
 
     const [popularityData, setPopularityData] = useState(null); //캐릭터 인기도
 
-    const [oguild_id, getOguild_id] = useState(null); //oguild_id 조회
-
-    const [guildMark, setGuildMark] = useState(null); //조합형 길드마크
-    const [guildMarkCustom, setGuildMarkCustom] = useState(null);
+    const [guildMark, setGuildMark] = useState(''); // 캐릭터 일반 길드 마크 정보
+    const [guildCustomMark, setGuildCustomMark] = useState(''); // 캐릭터 커스텀 길드 마크 정보
 
     const [isLoading, setIsLoading] = useState(true); // 로딩 상태를 나타내는 상태 변수
+
+    const [activeTab, setActiveTab] = useState('statEquip');
 
     const today = new Date();
     const yesterday = new Date(today.getTime());
@@ -74,7 +78,23 @@ export default function CharacterPage() {
     const date = ('0' + yesterday.getDate()).slice(-2); // 날짜를 2자리로 만듭니다.
     const usingday = `${year}-${month}-${date}`;
 
+    const renderInformationContainer = () => {
+        switch (activeTab) {
+            case 'statEquip':
+                return <StatEquip />;
+            case 'union':
+                return <Union_Artifact />;
+            case 'skillSymbol':
+                return <SkillSymbol />;
+            case 'mainSub':
+                return <MainSub />;
+            default:
+                return <StatEquip />;
+        }
+    };
+
     useEffect(() => {
+        fetchUserData();
         const timer = setTimeout(() => {
             setIsLoading(false);
         }, 2000);
@@ -111,7 +131,7 @@ export default function CharacterPage() {
             const {
                 character_hair: { hair_name },
                 character_face: { face_name },
-            } = getCharacterBeaty;
+            } = getCharacterBeaty.data;
             setCharacterHair(hair_name);
             setCharacterFace(face_name);
 
@@ -149,19 +169,16 @@ export default function CharacterPage() {
             const getOguild_id = await axios.get(`https://open.api.nexon.com/maplestory/v1/guild/id?guild_name=${character_guild_name}&world_name=${world_name}`, {
                 headers: { 'x-nxopen-api-key': maple_api },
             });
-            const { oguild_id } = getOguild_id.data;
-            getOguild_id(oguild_id);
+            const Oguild_id = getOguild_id.data.oguild_id;
 
-            getGuildInfo; // 길드 정보 조회
-            const getGuildInfo = await axios.get(`https://open.api.nexon.com/maplestory/v1/guild/id?guild_name=${character_guild_name}&world_name=${world_name}`, {
+            // 길드 마크 정보 가져오기
+            const getGuildMark = await axios.get(`https://open.api.nexon.com/maplestory/v1/guild/basic?oguild_id=${Oguild_id}&date=${usingday}`, {
                 headers: { 'x-nxopen-api-key': maple_api },
             });
-            const { guild_mark_custom, guild_mark } = getGuildInfo.data;
+            const { guild_mark_custom, guild_mark } = getGuildMark.data;
             const guildMarkIcon = `data:image/png;base64,${guild_mark_custom}`;
             setGuildMark(guild_mark);
-            setGuildMarkCustom(guildMarkIcon);
-
-            setIsLoading(false); // 모든 데이터를 불러온 후 로딩 상태를 false로 설정합니다.
+            setGuildCustomMark(guildMarkIcon);
         } catch (error) {
             console.log(error.response);
         }
@@ -177,33 +194,37 @@ export default function CharacterPage() {
     }
 
     return (
-        <CharacterContainer>
-            <CashItemContainer>
-                <CodyBox>
-                    <div>모자 : {cashCap}</div>
-                    <div>헤어 : {characterHair}</div>
-                    <div>성형 : {characterFace}</div>
-                    <div>상의 : {cashTop}</div>
-                    <div>하의 : {cashBottom}</div>
-                    <div>신발 : {cashShoes}</div>
-                    <div>무기 : {cashWeapon}</div>
-                </CodyBox>
-                <MoreCashItemContainer to="">코디 상세 정보 Link</MoreCashItemContainer>
-            </CashItemContainer>
-            <CharacterImageContainer>
-                <CharacterImage imageUrl={characterImage} alt="ct" />
-                <div>조회 기준일 : {usingday}</div>
-            </CharacterImageContainer>
+        <PageContainer>
+            <CharacterContainer>
+                <CashItemContainer>
+                    <CodyBox>
+                        <div>모자 : {cashCap}</div>
+                        <div>헤어 : {characterHair}</div>
+                        <div>성형 : {characterFace}</div>
+                        <div>상의 : {cashTop}</div>
+                        <div>하의 : {cashBottom}</div>
+                        <div>신발 : {cashShoes}</div>
+                        <div>무기 : {cashWeapon}</div>
+                    </CodyBox>
+                    <MoreCashItemContainer to="">코디 상세 정보 Link</MoreCashItemContainer>
+                </CashItemContainer>
+                <CharacterImageContainer>
+                    <CharacterImage imageUrl={characterImage} alt="ct" />
+                    <LastContainer>조회 기준일 : {usingday}</LastContainer>
+                </CharacterImageContainer>
 
-            <CharacterInfoContainer>
-                <CharacterName>
-                    {characterName} | {worldName} |<WorldImg>worldName={worldName}</WorldImg>
-                </CharacterName>
-                <CharacterDetail>
-                    Lv: {characterLevel} | {characterExp} | 인기도 {popularityData} | {characterGuild}
-                </CharacterDetail>
-                <CharacterDetail>
-                    {/* <ResetBt
+                <CharacterInfoContainer>
+                    <CharacterName>
+                        {characterName} | <WorldImg worldName={worldName}></WorldImg>
+                        {worldName}
+                    </CharacterName>
+                    <CharacterDetail>
+                        Lv: {characterLevel} | {Number(characterExp).toFixed(2)}% | 인기도 {popularityData} |&nbsp; <GuildMark guildCustomIcon={guildCustomMark} guildIcon={guildMark}></GuildMark>
+                        &nbsp;
+                        {characterGuild}
+                    </CharacterDetail>
+                    <CharacterDetail>
+                        {/* <ResetBt
                         onClick={() => {
                             fetchCharacterData(ocid);
                             fetchCharacterPopularityData(ocid);
@@ -212,11 +233,26 @@ export default function CharacterPage() {
                     >
                         정보 갱신
                     </ResetBt> */}
-                </CharacterDetail>
-            </CharacterInfoContainer>
-        </CharacterContainer>
+                    </CharacterDetail>
+                </CharacterInfoContainer>
+            </CharacterContainer>
+            <ImformationContainer>
+                <TabMenuBar>
+                    <TabMenuBt onClick={() => setActiveTab('statEquip')}>스탯/장비</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('union')}>유니온</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('skillSymbol')}>스킬 및 심볼</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('mainSub')}>본캐/부캐</TabMenuBt>
+                </TabMenuBar>
+                <UnderContainer>{renderInformationContainer()}</UnderContainer>
+            </ImformationContainer>
+        </PageContainer>
     );
 }
+const PageContainer = styled.div`
+    background-color: rgba(33, 34, 39);
+    flex-direction: column;
+    font-family: 'Cafe24SsurroundAir';
+`;
 
 const CharacterContainer = styled.div`
     margin: 0;
@@ -235,23 +271,24 @@ const CharacterInfoContainer = styled.div`
 `;
 
 const CharacterImageContainer = styled.div`
-    background-image: url(${(probs) => probs.imageUrl});
-    background-size: cover;
-    height: 100%;
-    align-items: center;
-    margin: 0px 20px;
+    display: flex;
     flex-direction: column;
+    margin-left: 2vh;
+`;
+const LastContainer = styled.div`
+    color: white;
+    font-size: 15px;
+    text-align: center;
 `;
 
 const CashItemContainer = styled.div`
-    padding: 8px;
     display: block;
     flex-direction: column;
     justify-content: center;
     background-color: rgba(55, 55, 55, 0.7);
     color: white;
     padding: 5px;
-    width: 130px;
+    width: 5.8vw;
     border-radius: 10px;
     font-size: 12px;
     overflow: hidden;
@@ -262,7 +299,7 @@ const CashItemContainer = styled.div`
 const CodyBox = styled.div`
     display: flex;
     flex-direction: column;
-    padding: 10px;
+    padding: 10px 10px 5px 10px;
     height: 100%;
 `;
 const MoreCashItemContainer = styled.div`
@@ -275,15 +312,17 @@ const MoreCashItemContainer = styled.div`
     align-items: center;
 `;
 
-const CharacterImage = styled.img`
-    width: 150px;
-    height: 150px;
+const CharacterImage = styled.div`
+    background-image: url(${(props) => props.imageUrl});
+    background-size: cover;
+    height: 100%;
 `;
 
 const CharacterName = styled.div`
-    font-size: 20px;
+    font-size: 25px;
     flex-direction: row;
     display: flex;
+    align-items: center;
 `;
 
 const WorldImg = styled.div`
@@ -312,8 +351,10 @@ const LoadingImg = styled.img`
 `;
 
 const CharacterDetail = styled.div`
+    font-size: 20px;
     margin: 20px 0;
     width: 100%;
+    display: flex;
 `;
 const ResetBt = styled.button`
     margin: 10px 0;
@@ -333,4 +374,52 @@ const ResetBt = styled.button`
     &:hover {
         background: #87dbae;
     }
+`;
+const ImformationContainer = styled.div`
+    background-color: #f8f9fa;
+    padding: 20px;
+    flex-grow: 1;
+    height: 100%;
+`;
+
+const TabMenuBar = styled.div`
+    background-color: white;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border: solid 1px #ced4da;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    margin-left: 22%;
+    margin-right: 22%;
+`;
+
+const TabMenuBt = styled.button`
+    background-color: white;
+    border: none;
+    border-right: solid 1px #ced4da;
+    width: 100px;
+    height: 40px;
+    margin-left: 15px;
+    padding-right: 15px;
+    justify-content: left;
+    cursor: pointer;
+    font-family: 'Cafe24SsurroundAir';
+`;
+const UnderContainer = styled.div`
+    border-right: solid 1px #ced4da;
+    background-color: white;
+    border-radius: 15px;
+    margin-left: 22%;
+    margin-right: 22%;
+    padding: 20px;
+`;
+
+const GuildMark = styled.div`
+    // 상세정보 컨테이너 내부의 길드 마크
+    background-image: url(${(props) => props.guildIcon || props.guildCustomIcon});
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+    display: flex;
 `;

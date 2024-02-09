@@ -2,3 +2,7 @@
     font-family: 'Maplestory Bold';
     src: url('./fonts/Maplestory Bold.ttf');
 }
+@font-face {
+    font-family: 'Cafe24SsurroundAir';
+    src: url('./fonts/Cafe24SsurroundAir-v1.1.ttf');
+}

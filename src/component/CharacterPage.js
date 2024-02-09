@@ -4,19 +4,19 @@ import styled from 'styled-components';
 import axios from 'axios';
 import loading from '../picture/주황버섯점프.gif';
 import bgImg from '../picture/별삼심.png';
-import Arcane from '../picture/Arcane.png';
-import Aurora from '../picture/Aurora.png';
-import Bera from '../picture/Bera.png';
-import Croa from '../picture/Croa.png';
-import Elysium from '../picture/Elysium.png';
-import Enosis from '../picture/Enosis.png';
-import Luna from '../picture/Luna.png';
-import Nova from '../picture/Nova.png';
-import Reboot from '../picture/Reboot.png';
-import Red from '../picture/Red.png';
-import Scania from '../picture/Scania.png';
-import Union from '../picture/Union.png';
-import Zenith from '../picture/Zenith.png';
+import Arcane from '../picture/World/Arcane.png';
+import Aurora from '../picture/World/Aurora.png';
+import Bera from '../picture/World/Bera.png';
+import Croa from '../picture/World/Croa.png';
+import Elysium from '../picture/World/Elysium.png';
+import Enosis from '../picture/World/Enosis.png';
+import Luna from '../picture/World/Luna.png';
+import Nova from '../picture/World/Nova.png';
+import Reboot from '../picture/World/Reboot.png';
+import Red from '../picture/World/Red.png';
+import Scania from '../picture/World/Scania.png';
+import Union from '../picture/World/Union.png';
+import Zenith from '../picture/World/Zenith.png';
 import StatEquip from './StatEquip';
 import Union_Artifact from './Union';
 import SkillSymbol from './SkillSymbol';
@@ -218,12 +218,10 @@ export default function CharacterPage() {
                         <div>신발 : {cashShoes}</div>
                         <div>무기 : {cashWeapon}</div>
                     </CashItemContainer>
-
                     <CharacterImageContainer>
                         <CharacterImage src={characterData.character_image} alt="ct" />
                         <div>조회 기준일 : {usingday}</div>
                     </CharacterImageContainer>
-
                     <CharacterInfoContainer>
                         <CharacterName>
                             {characterData.character_name} | <WorldImg worldName={characterData.world_name}></WorldImg>
@@ -248,7 +246,7 @@ export default function CharacterPage() {
             </BgImgContainer>
             <ImformationContainer>
                 <TabMenuBar>
-                    <TabMenuBt onClick={() => setActiveTab('statEquip')}>스탯장비</TabMenuBt>
+                    <TabMenuBt onClick={() => setActiveTab('statEquip')}>스탯/장비</TabMenuBt>
                     <TabMenuBt onClick={() => setActiveTab('union')}>유니온</TabMenuBt>
                     <TabMenuBt onClick={() => setActiveTab('skillSymbol')}>스킬 및 심볼</TabMenuBt>
                     <TabMenuBt onClick={() => setActiveTab('mainSub')}>본캐/부캐</TabMenuBt>
@@ -260,7 +258,7 @@ export default function CharacterPage() {
 }
 const PageContainer = styled.div`
     background-color: rgba(33, 34, 39);
-    flex-dirction: column;
+    flex-direction: column;
 `;
 
 const BgImgContainer = styled.div`
@@ -394,6 +392,8 @@ const TabMenuBt = styled.button`
     margin-left: 15px;
     padding-right: 15px;
     justify-content: left;
+    cursor: pointer;
+    font-family: 'Cafe24SsurroundAir';
 `;
 const UnderContainer = styled.div`
     border-right: solid 1px #ced4da;

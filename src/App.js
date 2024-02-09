@@ -25,7 +25,7 @@ function App() {
                         <Route path="/" element={<Main />} />
                         <Route path="/Ranking" element={<Ranking />} />
                         <Route path="/Percentage" element={<Percentage />} />
-                        <Route path="/u/:ocid" element={<CharacterPage />} />
+                        <Route path="/u/:ocid" element={<Test />} />
                     </Routes>
                 </InsideContainer>
                 <Footer />
