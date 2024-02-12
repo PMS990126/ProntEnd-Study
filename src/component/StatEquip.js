@@ -186,13 +186,23 @@ export default function StatEquip() {
     const [preset1Abilities, setPreset1Abilities] = useState(null);
     const [preset2Abilities, setPreset2Abilities] = useState(null);
     const [preset3Abilities, setPreset3Abilities] = useState(null);
-    const [selectAbPreset, setSelectAbPreset] = useState(null);
+    const [selectAbPreset, setSelectAbPreset] = useState(0);
+    const abPresets = [preset1Abilities, preset2Abilities, preset3Abilities]; // 프리셋 배열
 
-    const handlePresetClick = (preset) => {
-        setSelectAbPreset(preset);
+    const handleAbPresetClick = (presetIndex) => {
+        setSelectAbPreset(presetIndex);
     };
 
     //하이퍼스탯
+    const [preset1Hyper, setPreset1Hyper] = useState(null);
+    const [preset2Hyper, setPreset2Hyper] = useState(null);
+    const [preset3Hyper, setPreset3Hyper] = useState(null);
+    const [selectHyperPreset, setSelectHyperPreset] = useState(0);
+    const hyperPresets = [preset1Hyper, preset2Hyper, preset3Hyper]; // 프리셋 배열
+
+    const handleHyperPresetClick = (presetIndex) => {
+        setSelectHyperPreset(presetIndex);
+    };
 
     const today = new Date();
     const yesterday = new Date(today.getTime());
@@ -356,6 +366,8 @@ export default function StatEquip() {
                         break;
                 }
             });
+
+            //어빌리티 정보 불러오기
             const getCharacterAbility = await axios.get(`https://open.api.nexon.com/maplestory/v1/character/ability?ocid=${ocid}&date=${usingday}`, {
                 headers: { 'x-nxopen-api-key': maple_api },
             });
@@ -364,24 +376,49 @@ export default function StatEquip() {
             const { ability_preset_1, ability_preset_2, ability_preset_3 } = getCharacterAbility.data;
 
             // 각 프리셋의 ability_info 배열에서 필요한 정보 추출
-            const preset1Abilities = ability_preset_1.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
-                return { ability_no, ability_grade, ability_value };
-            });
+            setPreset1Abilities(
+                ability_preset_1.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
+                    return { ability_no, ability_grade, ability_value };
+                })
+            );
 
-            const preset2Abilities = ability_preset_2.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
-                return { ability_no, ability_grade, ability_value };
-            });
+            setPreset2Abilities(
+                ability_preset_2.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
+                    return { ability_no, ability_grade, ability_value };
+                })
+            );
 
-            const preset3Abilities = ability_preset_3.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
-                return { ability_no, ability_grade, ability_value };
-            });
+            setPreset3Abilities(
+                ability_preset_3.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
+                    return { ability_no, ability_grade, ability_value };
+                })
+            );
 
+            //하이퍼스탯 불러오기
             const getHyperStat = await axios.get(
                 `https://open.api.nexon.com/maplestory/v1/character/ability?ocid=${ocid}&date=${usingday}
             `,
                 {
                     headers: { 'x-nxopen-api-key': maple_api },
                 }
+            );
+            const { hyper_stat_preset_1, hyper_stat_preset_2, hyper_stat_preset_3 } = getHyperStat.data;
+            setPreset1Hyper(
+                hyper_stat_preset_1.map(({ stat_type, stat_point, stat_level, stat_increase }) => {
+                    return { stat_type, stat_point, stat_level, stat_increase };
+                })
+            );
+
+            setPreset2Hyper(
+                hyper_stat_preset_2.map(({ stat_type, stat_point, stat_level, stat_increase }) => {
+                    return { stat_type, stat_point, stat_level, stat_increase };
+                })
+            );
+
+            setPreset3Hyper(
+                hyper_stat_preset_3.map(({ stat_type, stat_point, stat_level, stat_increase }) => {
+                    return { stat_type, stat_point, stat_level, stat_increase };
+                })
             );
         } catch (error) {
             console.log(error.response);
@@ -425,28 +462,44 @@ export default function StatEquip() {
                 <DetailedStatContainer>
                     AP 배분 STR : {apStr} | AP 배분 DEX : {apDex} | AP 배분 INT : {apInt} | AP 배분 LUK : {apLuk} | AP 배분 HP : {apHp} | AP 배분 MP : {apMp}
                 </DetailedStatContainer>
-                <HyperStatContainer></HyperStatContainer>
-                <AbilityContainer>
-                    어빌리티:
-                    <button onClick={() => handlePresetClick(preset1Abilities)}>프리셋 1</button>
-                    <button onClick={() => handlePresetClick(preset2Abilities)}>프리셋 2</button>
-                    <button onClick={() => handlePresetClick(preset3Abilities)}>프리셋 3</button>
-                    {selectAbPreset && (
-                        <div>
-                            <h2>선택된 프리셋:</h2>
-                            {selectAbPreset.map((ability, index) => (
+                <MergeContainer>
+                    <AbilityContainer>
+                        어빌리티:
+                        <PresetBt onClick={() => handleAbPresetClick(0)}>프리셋 1</PresetBt>
+                        <PresetBt onClick={() => handleAbPresetClick(1)}>프리셋 2</PresetBt>
+                        <PresetBt onClick={() => handleAbPresetClick(2)}>프리셋 3</PresetBt>
+                        {abPresets[selectAbPreset] ? (
+                            abPresets[selectAbPreset].map((ability, index) => (
                                 <div key={index}>
-                                    <p>번호: {ability.ability_no}</p>
-                                    <p>등급: {ability.ability_grade}</p>
-                                    <p>옵션 및 수치: {ability.ability_value}</p>
+                                    <Abilitybox>{ability.ability_no}</Abilitybox>
+                                    <Abilitybox>{ability.ability_grade}</Abilitybox>
+                                    <Abilitybox>{ability.ability_value} </Abilitybox>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </AbilityContainer>
+                            ))
+                        ) : (
+                            <div>Loading...</div>
+                        )}
+                    </AbilityContainer>
 
-                <HyperStatContainer></HyperStatContainer>
-                <HyperStatContainer>하이퍼스탯:</HyperStatContainer>
+                    <HyperStatContainer>
+                        하이퍼스탯:
+                        <PresetBt onClick={() => handleHyperPresetClick(0)}>프리셋 1</PresetBt>
+                        <PresetBt onClick={() => handleHyperPresetClick(1)}>프리셋 2</PresetBt>
+                        <PresetBt onClick={() => handleHyperPresetClick(2)}>프리셋 3</PresetBt>
+                        {hyperPresets[selectHyperPreset] ? (
+                            <>
+                                {hyperPresets[selectHyperPreset].stats.map((stat, index) => (
+                                    <div key={index}>
+                                        <p>스탯 레벨: {stat.stat_level}</p>
+                                        <p>스탯 증가량: {stat.stat_increase}</p>
+                                    </div>
+                                ))}
+                            </>
+                        ) : (
+                            <div>Loading...</div>
+                        )}
+                    </HyperStatContainer>
+                </MergeContainer>
             </BgImgContainer>
         </Container>
     );
@@ -493,18 +546,27 @@ const DetailedStatContainer = styled.div`
     margin-bottom: 7.5px;
     font-size: 0.7vw;
 `;
-const AbilityContainer = styled.div`
+const MergeContainer = styled.div`
     display: flex;
+`;
+const AbilityContainer = styled.div`
     align-items: center;
     justify-content: left;
+    flex-direction: column;
     margin-bottom: 10px;
-    font-size: 0.7vw;
+    font-size: 0.75vw;
+    width: 50%;
+`;
+const Abilitybox = styled.div`
+    align-items: left;
+    justify-content: left;
 `;
 const HyperStatContainer = styled.div`
-    display: flex;
     align-items: center;
     justify-content: left;
-    font-size: 0.7vw;
+    font-size: 0.75vw;
+    flex-direction: column;
+    width: 50%;
 `;
 const PresetBt = styled.button`
     font-family: 'Cafe24SsurroundAir';
