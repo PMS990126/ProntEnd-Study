@@ -6,13 +6,13 @@ import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './component/Header';
 import Nav from './component/Nav';
-import Main from './component/Main';
+import Home from './component/Home';
 import Percentage from './component/Percentage';
 import Ranking from './component/Ranking';
 import Footer from './component/Footer';
-import CharacterPage from './component/CharacterPage';
+import Test1 from './component/Test1';
 import backgroundImage from './picture/Elluel.png';
-import Test from './component/Test';
+import CharacterPage from './component/CharacterPage';
 
 function App() {
     return (
@@ -22,10 +22,10 @@ function App() {
                 <Nav />
                 <InsideContainer>
                     <Routes>
-                        <Route path="/" element={<Main />} />
+                        <Route path="/" element={<Home />} />
                         <Route path="/Ranking" element={<Ranking />} />
                         <Route path="/Percentage" element={<Percentage />} />
-                        <Route path="/u/:ocid" element={<Test />} />
+                        <Route path="/u/:ocid" element={<CharacterPage />} />
                     </Routes>
                 </InsideContainer>
                 <Footer />
