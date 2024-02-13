@@ -492,7 +492,7 @@ export default function Stats_Equipment({ocid}) {
               </HyperStatPresetBox>
               {currentHyperStatPreset && currentHyperStatPreset.map((info, index) => (
                   info.stat_level !== 0 && info.stat_increase !== null ? (
-                      <HyperStatInfo style = {index === currentHyperStatPreset.length - 1 ? {borderBottom: "none"} : {}}>
+                      <HyperStatInfo style = {index === currentHyperStatPreset.length - 1 ? {border: "none"} : {}}>
                           <StatLevel>Lv.{info.stat_level}</StatLevel>
                           <StatIncrease>{info.stat_increase}</StatIncrease>
                       </HyperStatInfo>
