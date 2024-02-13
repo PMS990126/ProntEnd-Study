@@ -8,6 +8,22 @@
     src: url('./fonts/NEXONLv1GothicLight.ttf');
 }
 
+@font-face {
+    font-family: 'NEXONLv1GothicBold';
+    src: url('./fonts/NEXONLv1GothicBold.ttf');
+}
+
+@font-face {
+    font-family: 'NEXONLv1GothicRegular';
+    src: url('./fonts/NEXONLv1GothicRegular.ttf');
+}
+
+@font-face {
+    font-family: 'Maplestory Light';
+    src: url('./fonts/Maplestory Light.ttf');
+}
+
+
 .header a {
     background-color: rgba(33, 34, 39);
     display: flex;

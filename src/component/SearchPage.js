@@ -2,11 +2,41 @@ import React, { useState, useEffect } from 'react';
 import {useNavigate, useLocation } from "react-router-dom"
 import axios from "axios";
 import backgroundImage from "../picture/perion.png"
+import './Component.css';
 import styled from 'styled-components';
+import Arcane from '../picture/Arcane.png';
+import Aurora from '../picture/Aurora.png';
+import Bera from '../picture/Bera.png';
+import Croa from '../picture/Croa.png';
+import Elysium from '../picture/Elysium.png';
+import Enosis from '../picture/Enosis.png';
+import Luna from '../picture/Luna.png';
+import Nova from '../picture/Nova.png';
+import Reboot from '../picture/Reboot.png';
+import Red from '../picture/Red.png';
+import Scania from '../picture/Scania.png';
+import Union_ from '../picture/Union.png';
+import Zenith from '../picture/Zenith.png';
 import Stats from './Stats';
 import Union from './Union';
 import Skills from './Skills';
 import MainSub from './MainSub';
+
+const worldMark = {
+    아케인: Arcane,
+    오로라: Aurora,
+    베라: Bera,
+    크로아: Croa,
+    엘리시움: Elysium,
+    이노시스: Enosis,
+    루나: Luna,
+    노바: Nova,
+    리부트: Reboot,
+    레드: Red,
+    스카니아: Scania,
+    유니온: Union_,
+    제니스: Zenith,
+};
 
 
 export default function SearchPage() {
@@ -170,12 +200,12 @@ export default function SearchPage() {
 
                 <ImageContainer>
                     <Image src = {charImage}></Image>
-                    <LastDay>마지막 접속일:1일 전</LastDay>
+                    <LastDay>마지막 접속일 : 1일 전</LastDay>
                 </ImageContainer>
 
                 <UserContainer>
                     <NickWorldContainer>
-                        {charNick} | {charWorldName}
+                        {charNick} | <WorldImg charWorldName={charWorldName}></WorldImg>   {charWorldName}
                     </NickWorldContainer>
 
                     <InfoContainer>
@@ -187,9 +217,9 @@ export default function SearchPage() {
             </MainContainer>
             <TabContainer>
                 <TabButton active={activeTab === 'Stats'} onClick = {() => handleTabClick('Stats')}>스탯장비</TabButton>
-                <TabButton active={activeTab === 'Stats'} onClick = {() => handleTabClick('Union')}>유니온</TabButton>
-                <TabButton active={activeTab === 'Stats'} onClick = {() => handleTabClick('Skills')}>스킬 및 심볼</TabButton>
-                <TabButton active={activeTab === 'Stats'} onClick = {() => handleTabClick('MainSub')}>본캐/부캐</TabButton>
+                <TabButton active={activeTab === 'Union'} onClick = {() => handleTabClick('Union')}>유니온</TabButton>
+                <TabButton active={activeTab === 'Skills'} onClick = {() => handleTabClick('Skills')}>스킬 및 심볼</TabButton>
+                <TabButton active={activeTab === 'MainSub'} onClick = {() => handleTabClick('MainSub')}>본캐/부캐</TabButton>
             </TabContainer>
 
             <UnderContainer>
@@ -263,8 +293,8 @@ const ImageContainer = styled.div`
 `;
 
 const Image = styled.img`
-    width: 150px;
-    height: 150px;
+    width: 200px;
+    height: 200px;
     position: relative;
     left: 20%;
 `;
@@ -273,18 +303,28 @@ const LastDay = styled.div`
     color: white;
     display: flex;
     flex-direction: column;
+    font-family: 'NEXONLv1GothicRegular';
 `;
 
 const UserContainer = styled.div`
     display: flex;
     flex-direction: column;
-    margin-left: 100px;
+    
     justify-content: center;
     font-family: 'Maplestory Light';
 `;
 
 const NickWorldContainer = styled.div`
-    font-size: 20px;
+    font-size: 30px;
+    margin-bottom: 10px;
+`;
+
+const WorldImg = styled.div`
+    background-image: url(${(probs) => worldMark[probs.charWorldName]});
+    background-size: cover;
+    width: 20px;
+    height: 20px;
+    margin-left: 100px;
 `;
 
 const InfoContainer = styled.div`
@@ -302,7 +342,7 @@ const ResetButton = styled.button`
     width: 150px;
     height: 50px;
     margin-top: 20px;
-    margin-left: 50px;
+    margin-left: 70px;
     background: green;
     border-radius: 10px;
     color: white;
