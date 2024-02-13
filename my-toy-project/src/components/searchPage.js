@@ -60,6 +60,8 @@ export default function SearchPage() {
 
     const bannerImg = [geulja, myeonghun, pangE, suho, wongi]; // 배너 이미지 배열
 
+    const [ocid, setOcid] = useState(""); // 캐릭터 ocid 값 
+
     const charName = queryParams.get("input"); // 검색한 캐릭터 이름 가져오기
     const searchDate = queryParams.get("date"); // 검색한 날짜&시간 가져오기
 
@@ -91,6 +93,7 @@ export default function SearchPage() {
             const getOcid = await axios.get(`https://open.api.nexon.com/maplestory/v1/id?character_name=${charName}`, {
                 headers: {"x-nxopen-api-key" : NEXON_OPEN_API_KEY}});
             const Ocid = getOcid.data.ocid;
+            setOcid(getOcid.data.ocid);
 
             // 캐릭터 헤어&성형 정보 가져오기
             const getBeautyInfo = await axios.get(`https://open.api.nexon.com/maplestory/v1/character/beauty-equipment?ocid=${Ocid}&date=${searchDate}`, {
@@ -265,10 +268,10 @@ export default function SearchPage() {
                 <NaviButton active = {activeTab === "MainChar_SubChar"} onClick = {() => setActiveTab("MainChar_SubChar")}>본캐 & 부캐</NaviButton>
             </NaviBar>
             <DetailInfoContainer>
-                {activeTab === "Stats_Equipment" && <Stats_Equipment />}
-                {activeTab === "Union_Artifact" && <Union_Artifact />}
-                {activeTab === "Skill_Symbol" && <Skill_Symbol />}
-                {activeTab === "MainChar_SubChar" && <MainChar_SubChar />}
+                {activeTab === "Stats_Equipment" && <Stats_Equipment ocid = {ocid}/>}
+                {activeTab === "Union_Artifact" && <Union_Artifact ocid = {ocid}/>}
+                {activeTab === "Skill_Symbol" && <Skill_Symbol ocid = {ocid}/>}
+                {activeTab === "MainChar_SubChar" && <MainChar_SubChar ocid = {ocid}/>}
             </DetailInfoContainer>
         </Container>
     );
