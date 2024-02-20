@@ -42,7 +42,7 @@ const worldMark = {
 };
 
 export default function CharacterPage() {
-    const maple_api = process.env.REACT_APP_NEXON_OPEN_API2;
+    const maple_api = process.env.REACT_APP_NEXON_OPEN_API1;
     const navigate = useNavigate();
     const prevOcidRef = useRef();
 
@@ -250,10 +250,18 @@ export default function CharacterPage() {
             </CharacterContainer>
             <ImformationContainer>
                 <TabMenuBar>
-                    <CombinedTabMenu onClick={() => setActiveTab('statEquip')}>스탯/장비</CombinedTabMenu>
-                    <CombinedTabMenu onClick={() => setActiveTab('union')}>유니온</CombinedTabMenu>
-                    <CombinedTabMenu onClick={() => setActiveTab('skillSymbol')}>스킬 및 심볼</CombinedTabMenu>
-                    <CombinedTabMenu onClick={() => setActiveTab('mainSub')}>본캐/부캐</CombinedTabMenu>
+                    <CombinedTabMenu onClick={() => setActiveTab('statEquip')} isSelected={activeTab === 'statEquip'}>
+                        스탯/장비
+                    </CombinedTabMenu>
+                    <CombinedTabMenu onClick={() => setActiveTab('union')} isSelected={activeTab === 'union'}>
+                        유니온
+                    </CombinedTabMenu>
+                    <CombinedTabMenu onClick={() => setActiveTab('skillSymbol')} isSelected={activeTab === 'skillSymbol'}>
+                        스킬 및 심볼
+                    </CombinedTabMenu>
+                    <CombinedTabMenu onClick={() => setActiveTab('mainSub')} isSelected={activeTab === 'mainSub'}>
+                        본캐/부캐
+                    </CombinedTabMenu>
                 </TabMenuBar>
                 <UnderContainer>{renderInformationContainer()}</UnderContainer>
             </ImformationContainer>
@@ -261,7 +269,6 @@ export default function CharacterPage() {
     );
 }
 const PageContainer = styled.div`
-    background-color: rgba(33, 34, 39);
     flex-direction: column;
     font-family: 'Cafe24SsurroundAir';
 `;
@@ -390,9 +397,9 @@ const ResetBt = styled.button`
 `;
 const ImformationContainer = styled.div`
     background-color: #f8f9fa;
-    padding: 20px;
     flex-grow: 1;
     height: 100%;
+    margin-top: 1vh;
 `;
 
 const TabMenuBar = styled.div`
@@ -402,8 +409,8 @@ const TabMenuBar = styled.div`
     align-items: center;
     border: solid 1px #ced4da;
     border-radius: 15px;
-    margin-left: 22%;
-    margin-right: 22%;
+    margin-left: 15%;
+    margin-right: 15%;
 `;
 
 const CombinedTabMenu = styled.div`
@@ -419,6 +426,8 @@ const CombinedTabMenu = styled.div`
     height: 40px;
     margin-left: 0;
     font-family: 'Cafe24SsurroundAir';
+    background-color: ${(props) => (props.isSelected ? '#adb5bd' : 'white')};
+
     cursor: pointer;
     &:hover {
         background: #adb5bd;
@@ -426,13 +435,11 @@ const CombinedTabMenu = styled.div`
 `;
 
 const UnderContainer = styled.div`
-    border: solid 1px #ced4da;
     background-color: white;
-    border-radius: 15px;
-    margin-left: 22%;
-    margin-right: 22%;
-    padding: 20px;
+    margin-left: 15%;
+    margin-right: 15%;
     margin-top: 1.5vh;
+    margin-bottom: 2vh;
 `;
 
 const GuildMark = styled.div`

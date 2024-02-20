@@ -29,7 +29,7 @@ function SearchCharacter() {
 
     const handleSearch = (e) => {
         e.preventDefault(); // form의 기본 이벤트인 페이지 리로드를 막습니다.
-        const maple_api = process.env.REACT_APP_NEXON_OPEN_API2;
+        const maple_api = process.env.REACT_APP_NEXON_OPEN_API1;
         fetch(`https://open.api.nexon.com/maplestory/v1/id?character_name=${encodeURIComponent(searchTerm)}`, {
             method: 'GET',
             headers: {
@@ -73,6 +73,7 @@ const MainContainer = styled.div`
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    background-size: 100%;
 `;
 
 const TitleContainer = styled.a`

@@ -5,6 +5,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 export default function Header() {
+    const maple_api = process.env.REACT_APP_NEXON_OPEN_API1;
+
     const [searchTerm, setSearchTerm] = useState(null);
     const navigate = useNavigate();
 
@@ -16,7 +18,6 @@ export default function Header() {
     };
     const handleSearch = (e) => {
         e.preventDefault();
-        const maple_api = process.env.REACT_APP_NEXON_OPEN_API2;
         fetch(`https://open.api.nexon.com/maplestory/v1/id?character_name=${encodeURIComponent(searchTerm)}`, {
             method: 'GET',
             headers: {
