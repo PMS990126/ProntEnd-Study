@@ -166,6 +166,10 @@ export default function Stats_Equipment({ocid}) {
     const [selectedHyperStatPreset, setSelectedHyperStatPreset] = useState(""); // 현재 선택된 하이퍼 스탯 프리셋 번호
     const [currentHyperStatPreset, setCurrentHyperStatPreset] = useState(""); // 현재 선택된 하이퍼 스탯 프리셋의 정보
 
+    const [equipmentInfo, setEquipmentInfo] = useState({}); // 캐릭터 장착 장비 정보
+    const [selectedEquipmentPreset, setSelectedEquipmentPreset] = useState(""); // 현재 선택된 장비 프리셋 번호
+    const [currentEquipmentPreset, setCurrentEquipmentPreset] = useState(""); // 현재 선택된 장비 프리셋의 정보
+
     const fetchUserData = async () => {
         try{
             // 캐릭터 상세스탯 정보 가져오기
@@ -252,6 +256,12 @@ export default function Stats_Equipment({ocid}) {
                 headers: {"x-nxopen-api-key" : NEXON_OPEN_API_KEY}});
             setHyperStatInfo(getHyperStatInfo.data);
             setCurrentHyperStatPreset(getHyperStatInfo.data[`hyper_stat_preset_${getHyperStatInfo.data.use_preset_no}`]);
+
+            // 캐릭터 장착 장비 정보 가져오기
+            const getEquipmentInfo = await axios.get(`https://open.api.nexon.com/maplestory/v1/character/item-equipment?ocid=${ocid}&date=${searchDate}`, {
+                headers: {"x-nxopen-api-key" : NEXON_OPEN_API_KEY}});
+            setEquipmentInfo(getEquipmentInfo.data);
+            setCurrentEquipmentPreset(getEquipmentInfo.data[`item_equipment_preset_${getEquipmentInfo.data.preset_no}`]);
         } catch(error) {console.log(error.response);}
     };
 
@@ -283,6 +293,75 @@ export default function Stats_Equipment({ocid}) {
             setSelectedHyperStatPreset(presetNo);
         }
     };
+
+    const equipmentPresetChange = (presetNo) => { // 장착 장비 프리셋 변경 메서드
+        if (equipmentInfo) {
+            setCurrentEquipmentPreset(equipmentInfo[`item_equipment_preset_${presetNo}`]);
+            setSelectedEquipmentPreset(presetNo);
+        }
+    };
+
+    function transformPotentialOption(option) {
+        if (option && (option.startsWith("공격 시") || option.startsWith("피격 시") || option.startsWith("피격 후"))) {
+            return "잡옵";
+        }
+
+        if (option && (option.startsWith("최대 HP") || option.startsWith("최대 MP"))) {
+            return option.replace("최대 ", "");
+        }
+
+        const replacements = [
+            { from: "모든 스킬의 재사용 대기시간 : -2초(10초 이하는 10%감소, 5초 미만으로 감소 불가)", to: "쿨감 : -2초" },
+            { from: "모든 스킬의 재사용 대기시간 : -1초(10초 이하는 10%감소, 5초 미만으로 감소 불가)", to: "쿨감 : -1초" },
+            { from: "모든 스킬의 재사용 대기시간 : -1초(10초 이하는 5%감소, 5초 미만으로 감소 불가)", to: "쿨감 : -1초" },
+            { from: "크리티컬 데미지 : +8%", to: "크뎀 : +8%" },
+            { from: "크리티컬 데미지 : +3%", to: "크뎀 : +3%" },
+            { from: "크리티컬 데미지 : +1%", to: "크뎀 : +1%" },
+            { from: "보스 몬스터 공격 시 데미지 : +40%", to: "보공 : +40%" },
+            { from: "보스 몬스터 공격 시 데미지 : +35%", to: "보공 : +35%" },
+            { from: "보스 몬스터 공격 시 데미지 : +30%", to: "보공 : +30%" },
+            { from: "보스 몬스터 공격 시 데미지 : +20%", to: "보공 : +20%" },
+            { from: "보스 몬스터 공격 시 데미지 : +18%", to: "보공 : +18%" },
+            { from: "보스 몬스터 공격 시 데미지 : +12%", to: "보공 : +12%" },
+            { from: "크리티컬 확률 : +12%", to: "크확 : +12%" },
+            { from: "크리티컬 확률 : +9%", to: "크확 : +9%" },
+            { from: "크리티컬 확률 : +8%", to: "크확 : +8%" },
+            { from: "크리티컬 확률 : +6%", to: "크확 : +6%" },
+            { from: "크리티컬 확률 : +4%", to: "크확 : +4%" },
+            { from: "크리티컬 확률 : +3%", to: "크확 : +3%" },
+            { from: "크리티컬 확률 : +2%", to: "크확 : +2%" },
+            { from: "크리티컬 확률 : +1%", to: "크확 : +1%" },
+            { from: "몬스터 방어율 무시 : +40%", to: "방무 : +40%" },
+            { from: "몬스터 방어율 무시 : +35%", to: "방무 : +35%" },
+            { from: "몬스터 방어율 무시 : +30%", to: "방무 : +30%" },
+            { from: "몬스터 방어율 무시 : +15%", to: "방무 : +15%" },
+            { from: "몬스터 방어율 무시 : +5%", to: "방무 : +5%" },
+            { from: "몬스터 방어율 무시 : +4%", to: "방무 : +4%" },
+            { from: "몬스터 방어율 무시 : +3%", to: "방무 : +3%" },
+            { from: "아이템 드롭률 : +20%", to: "아드 : +20%" },
+            { from: "메소 획득량 : +20%", to: "메획 : +20%" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +10%", to: "기타" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +20%", to: "기타" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +30%", to: "기타" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +40%", to: "기타" },
+            { from: "캐릭터 기준 9레벨 당 STR : +2", to: "9렙당 STR +2" },
+            { from: "캐릭터 기준 9레벨 당 STR : +1", to: "9렙당 STR +1" },
+            { from: "캐릭터 기준 9레벨 당 DEX : +2", to: "9렙당 DEX +2" },
+            { from: "캐릭터 기준 9레벨 당 DEX : +1", to: "9렙당 DEX +1" },
+            { from: "캐릭터 기준 9레벨 당 INT : +2", to: "9렙당 INT +2" },
+            { from: "캐릭터 기준 9레벨 당 INT : +1", to: "9렙당 INT +1" },
+            { from: "캐릭터 기준 9레벨 당 LUK : +2", to: "9렙당 LUK +2" },
+            { from: "캐릭터 기준 9레벨 당 LUK : +1", to: "9렙당 LUK +1" },
+        ];
+    
+        for (const replacement of replacements) {
+            if (option === replacement.from) {
+                return replacement.to;
+            }
+        }
+        return option; 
+    }
+    
 
     useEffect(() => {
         fetchUserData();
@@ -500,29 +579,65 @@ export default function Stats_Equipment({ocid}) {
               ))}
           </StatContainer>
           <EquipmentContainer>
-
+              <EquipmentTitle>장비 상세정보</EquipmentTitle>
+              <EquipmentPresetBox>
+                  <EquipmentPresetButton onClick = {() => {equipmentPresetChange("1")}} selected = {selectedEquipmentPreset === "1"}>프리셋 1</EquipmentPresetButton>
+                  <EquipmentPresetButton onClick = {() => {equipmentPresetChange("2")}} selected = {selectedEquipmentPreset === "2"}>프리셋 2</EquipmentPresetButton>
+                  <EquipmentPresetButton onClick = {() => {equipmentPresetChange("3")}} selected = {selectedEquipmentPreset === "3"} style = {{border: "none"}}>프리셋 3</EquipmentPresetButton>
+              </EquipmentPresetBox>
+              <EquipmentBox>
+                  {currentEquipmentPreset && currentEquipmentPreset.map((item, index) => (
+                      <EquipmentInfoBox key = {index} marginBottom = {index === currentEquipmentPreset.length - 1 ? '5vh' : '0'}>
+                          <TopBox>
+                              <EquipmentImageBox>
+                                  <EquipmentImage EquipmentImg = {item.item_icon}></EquipmentImage>
+                              </EquipmentImageBox>
+                              <EquipmentDetailInfoBox>
+                                  <EquipmentPartTitle>{item.item_equipment_slot}</EquipmentPartTitle>
+                                  <EquipmentName>{item.item_name}</EquipmentName>
+                                  <Equipment_SF_AddOp_Box>
+                                      <StarForce>★ {item.starforce}</StarForce>
+                                  </Equipment_SF_AddOp_Box>
+                              </EquipmentDetailInfoBox>
+                          </TopBox>
+                          <BottomBox>
+                              <PotentialBox>
+                                  <PotentialTitle>잠재</PotentialTitle>
+                                  <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_1)}</PotentialInfo>
+                                  <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_2)}</PotentialInfo>
+                                  <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_3)}</PotentialInfo>
+                              </PotentialBox>
+                              <PotentialBox>
+                                  <PotentialTitle>에디</PotentialTitle>
+                                  <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_1)}</PotentialInfo>
+                                  <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_2)}</PotentialInfo>
+                                  <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_3)}</PotentialInfo>
+                              </PotentialBox>
+                          </BottomBox>
+                      </EquipmentInfoBox>
+                  ))}
+              </EquipmentBox>
           </EquipmentContainer>
       </Container>
     );
 }
 
 const Container = styled.div` // 최상위 부모 컨테이너
-    display: flex;
     width: 100%;
 `;
 
 const StatContainer = styled.div` // 최상위 컨테이너 내부의 스탯 컨테이너
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     width: 25%;
-    margin-right: 5%;
+    margin-right: 4%;
     margin-bottom: 2.5%;
     border-radius: 10px;
     border: 2px solid #DDE3E9;
 `;
 
 const EquipmentContainer = styled.div` // 최상위 컨테이너 내부의 장비 컨테이너
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
     width: 70%;
     border-radius: 10px;
@@ -766,4 +881,177 @@ const StatIncrease = styled.div` // 하이퍼 스탯 정보 컨테이너 내부�
     font-size: 12.5px;
     line-height: 5vh;
     margin-left: 10px;
+`;
+
+const EquipmentTitle = styled.div` // 장비 컨테이너 내부의 최상단 제목 컴포넌트
+    width: 100%;
+    height: 5vh;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 5vh;
+    background-color: #ECEFF7;
+    color: black;
+    border-radius: 10px 10px 0px 0px;
+    border-bottom: 2px solid #DDE3E9;
+`;
+
+const EquipmentPresetBox = styled.div` // 장비 컨테이너 내부의 장착장비 프리셋 박스
+    display: flex;
+    width: 100%;
+    height: 5vh;
+    border-bottom: 2px solid #DDE3E9;
+`;
+
+const EquipmentPresetButton = styled.div` // 장착장비 프리셋 박스 내부의 장착장비 프리셋 버튼
+    width: 33.3%;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 5vh;
+    border-right: 2px solid #DDE3E9;
+    background-color: ${props => props.selected ? "#E9EAED" : "transparent"};
+
+    &:hover {
+        background-color: #FAFAFA;
+    }
+`;
+
+const EquipmentBox = styled.div` // 장비 컨테이너 내부의 장비 박스
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    background-color: #FAFAFA;
+`;
+
+const EquipmentInfoBox = styled.div` // 장비 박스 내부의 장비 상세정보 박스
+    display: flex;
+    flex-direction: column;
+    width: 30%;
+    height: 15vh;
+    border-radius: 5px;
+    border: 1px solid #DDE3E9;
+    margin-top: 2.5%;
+    margin-left: 2.5%;
+    background-color: white;
+`;
+
+const TopBox = styled.div` // 장비 상세정보 박스 내부의 상단 박스
+    display: flex;
+    width: 100%;
+    height: 9vh;
+    border-bottom: 1px solid #DDE3E9;
+`;
+
+const EquipmentImageBox = styled.div` // 상단 박스 내부의 장비 이미지 박스
+    width: 30%;
+    height: 9vh;
+    border-right: 1px solid #DDE3E9;
+    margin-bottom: ${props => props.marginBottom || '0'};
+`;
+
+const EquipmentImage = styled.div` // 장비 이미지 박스 내부의 장비 이미지
+    width: 80%;
+    height: 80%;
+    margin-top: 10%;
+    margin-left: 10%;
+    background-image: url(${props => props.EquipmentImg});
+    background-size: contain;
+    background-repeat: no-repeat;
+`;
+
+const EquipmentDetailInfoBox = styled.div` // 상단 박스 내부의 장비 상세정보 박스
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    height: 9vh;
+`;
+
+const EquipmentPartTitle = styled.div` // 장비 상세정보 박스 내부의 장비 부위 이름
+    width: 100%;
+    height: 3vh;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 3vh;
+    border-bottom: 1px solid #DDE3E9;
+    background-color: #ECEFF7;
+`;
+
+const EquipmentName = styled.div` // 장비 상세정보 박스 내부의 장비명
+    width: 100%;
+    height: 3vh;
+    font-size: 12.5px;
+    text-align: center;
+    line-height: 3vh;
+    border-bottom: 1px solid #DDE3E9;
+`;
+
+const Equipment_SF_AddOp_Box = styled.div` // 장비 상세정보 박스 내부의 스타포스&추가옵션 박스
+    diaplay: flex;
+    width: 100%;
+    height: 3vh;
+`;
+
+const StarForce = styled.div` // 스타포스&추가옵션 박스 내부의 스타포스 정보
+    width: 20%;
+    height: 2vh;
+    border-radius: 3px;
+    background-color: #F5EDE1;
+    color: #F6A730;
+    font-size: 12.5px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 2vh;
+    margin-top: 0.4vh;
+    margin-left: 10%;
+`;
+
+const BottomBox = styled.div` // 장비 상세정보 박스 내부의 하단 박스
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 6vh;
+`;
+
+const PotentialBox = styled.div` // 하단 박스 내부의 잠재능력 박스
+    display: flex;
+    width: 100%;
+    height: 3vh;
+    border-bottom: 1px solid #DDE3E9;
+`;
+
+const PotentialTitle = styled.div` // 잠재능력 박스 내부의 제목 컴포넌트
+    width: 20%;
+    height: 3vh;
+    font-size: 12.5px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 3vh;
+    background-color: #ECEFF7;
+    border-right: 1px solid #DDE3E9;
+`;
+
+const PotentialInfo = styled.div` // 잠재능력 박스 내부의 잠재능력 정보
+    width: 25%;
+    height: 3vh;
+    font-size: 10px;
+    line-height: 3vh;
+    margin-left: 1%;
+
+    color: ${props => {
+        switch (props.grade) {
+            case "레전드리":
+                return "#5CB85C";
+            case "유니크":
+                return "#F6A730";
+            case "에픽":
+                return "#6D62A1";
+            case "레어":
+                return "#5393CA";
+            default:
+                return "transparent";
+        }
+    }};
 `;
