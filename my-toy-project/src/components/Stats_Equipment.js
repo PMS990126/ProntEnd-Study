@@ -106,6 +106,70 @@ export default function Stats_Equipment({ocid}) {
         "제로": Zero
     };    
 
+    const charClass = {
+        "아델": "전사",
+        "엔젤릭버스터": "해적(DEX)",
+        "아란": "전사",
+        "아크메이지(불,독)": "마법사",
+        "아크메이지(썬,콜)": "마법사",
+        "아크": "해적(STR)",
+        "배틀메이지": "마법사",
+        "초보자": "전사",
+        "비숍": "마법사",
+        "블래스터": "전사",
+        "보우마스터": "궁수",
+        "카데나": "도적",
+        "캐논마스터": "해적(STR)",
+        "캡틴": "해적(DEX)",
+        "시티즌": "전사",
+        "다크나이트": "전사",
+        "데몬어벤져": "데벤져",
+        "데몬슬레이어": "전사",
+        "듀얼블레이더": "도적",
+        "은월": "해적(STR)",
+        "에반": "마법사",
+        "플레임위자드": "마법사",
+        "히어로": "전사",
+        "호영": "도적",
+        "일리움": "마법사",
+        "카인": "궁수",
+        "카이저": "전사",
+        "칼리": "도적",
+        "키네시스": "마법사",
+        "라라": "마법사",
+        "루미너스": "마법사",
+        "신궁": "궁수",
+        "메카닉": "해적(DEX)",
+        "메르세데스": "궁수",
+        "미하일": "전사",
+        "나이트로드": "도적",
+        "나이트워커": "도적",
+        "노블레스": "전사",
+        "팔라딘": "전사",
+        "패스파인더": "궁수",
+        "팬텀": "도적",
+        "섀도어": "도적",
+        "소울마스터": "전사",
+        "스트라이커": "해적(STR)",
+        "바이퍼": "해적(STR)",
+        "와일드헌터": "궁수",
+        "윈드브레이커": "궁수",
+        "제논": "제논",
+        "제로": "전사"
+    };    
+
+    const noAddnoStar = ["보조무기", "엠블렘", "훈장", "뱃지"];
+
+    const pendantName = ["정령의 펜던트", "준비된 정령의 펜던트"];
+
+    const SeedRing = ["스킬 사용 시", "일정 시간", "자신의 HP", "자신의 MP", "컨티뉴어스", "공격 시", "The Seed", "일정 확률", "상태 이상"];
+
+    const noAddOp = ["무기", "보조무기", "엠블렘", "어깨장식", "훈장", "뱃지", "기계 심장", "반지1", "반지2", "반지3", "반지4"];
+
+    const EventRing = ["오닉스 링", "벤젼스 링", "코스모스 링", "SS급 마스터 쥬얼링", "결속의 반지", "제로 그라테스링",
+                      "어드벤쳐 크리티컬링", "어드벤쳐 다크 크리티컬링", "다크 어드벤쳐 크리티컬링", "어드벤쳐 딥다크 크리티컬링",
+                      "카오스 링", "테네브리스 원정대 반지", "글로리온 링 : 슈프림", "어웨이크 링", "이터널 플레임 링", "어비스 헌터스 링"];
+
     const NEXON_OPEN_API_KEY = process.env.REACT_APP_NEXON_OPEN_API_KEY; // 넥슨 오픈 Api key
 
     const location = useLocation(); // URL 정보 객체 반환 훅
@@ -169,6 +233,10 @@ export default function Stats_Equipment({ocid}) {
     const [equipmentInfo, setEquipmentInfo] = useState({}); // 캐릭터 장착 장비 정보
     const [selectedEquipmentPreset, setSelectedEquipmentPreset] = useState(""); // 현재 선택된 장비 프리셋 번호
     const [currentEquipmentPreset, setCurrentEquipmentPreset] = useState(""); // 현재 선택된 장비 프리셋의 정보
+
+    const [characterClass, setCharacterClass] = useState(""); // 캐릭터 직업 분류 정보
+
+    const [charAndroid, setCharAndroid] = useState(""); // 캐릭터 안드로이드 정보
 
     const fetchUserData = async () => {
         try{
@@ -262,6 +330,14 @@ export default function Stats_Equipment({ocid}) {
                 headers: {"x-nxopen-api-key" : NEXON_OPEN_API_KEY}});
             setEquipmentInfo(getEquipmentInfo.data);
             setCurrentEquipmentPreset(getEquipmentInfo.data[`item_equipment_preset_${getEquipmentInfo.data.preset_no}`]);
+            const getCharClass = getEquipmentInfo.data.character_class;
+            const getClass = charClass[getCharClass];
+            setCharacterClass(getClass);
+
+            // 캐릭터 안드로이드 정보 가져오기
+            const getAndroidInfo = await axios.get(`https://open.api.nexon.com/maplestory/v1/character/android-equipment?ocid=${ocid}&date=${searchDate}`, {
+                headers: {"x-nxopen-api-key" : NEXON_OPEN_API_KEY}});
+            setCharAndroid(getAndroidInfo.data);
         } catch(error) {console.log(error.response);}
     };
 
@@ -301,8 +377,8 @@ export default function Stats_Equipment({ocid}) {
         }
     };
 
-    function transformPotentialOption(option) {
-        if (option && (option.startsWith("공격 시") || option.startsWith("피격 시") || option.startsWith("피격 후"))) {
+    function transformPotentialOption(option) { // 잠재옵션명 변환 메서드
+        if (option && (option.startsWith("공격 시") || option.startsWith("피격 시") || option.startsWith("피격 후") || option.startsWith("30%"))) {
             return "잡옵";
         }
 
@@ -340,10 +416,6 @@ export default function Stats_Equipment({ocid}) {
             { from: "몬스터 방어율 무시 : +3%", to: "방무 : +3%" },
             { from: "아이템 드롭률 : +20%", to: "아드 : +20%" },
             { from: "메소 획득량 : +20%", to: "메획 : +20%" },
-            { from: "HP 회복 아이템 및 회복 스킬 효율 : +10%", to: "기타" },
-            { from: "HP 회복 아이템 및 회복 스킬 효율 : +20%", to: "기타" },
-            { from: "HP 회복 아이템 및 회복 스킬 효율 : +30%", to: "기타" },
-            { from: "HP 회복 아이템 및 회복 스킬 효율 : +40%", to: "기타" },
             { from: "캐릭터 기준 9레벨 당 STR : +2", to: "9렙당 STR +2" },
             { from: "캐릭터 기준 9레벨 당 STR : +1", to: "9렙당 STR +1" },
             { from: "캐릭터 기준 9레벨 당 DEX : +2", to: "9렙당 DEX +2" },
@@ -352,6 +424,17 @@ export default function Stats_Equipment({ocid}) {
             { from: "캐릭터 기준 9레벨 당 INT : +1", to: "9렙당 INT +1" },
             { from: "캐릭터 기준 9레벨 당 LUK : +2", to: "9렙당 LUK +2" },
             { from: "캐릭터 기준 9레벨 당 LUK : +1", to: "9렙당 LUK +1" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +10%", to: "기타" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +20%", to: "기타" },
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +30%", to: "기타" },         
+            { from: "HP 회복 아이템 및 회복 스킬 효율 : +40%", to: "기타" },
+            { from: "<쓸만한 어드밴스드 블레스> 스킬 사용 가능", to: "기타" },
+            { from: "<쓸만한 미스틱 도어> 스킬 사용 가능", to: "기타" },
+            { from: "<쓸만한 하이퍼 바디> 스킬 사용 가능", to: "기타" },
+            { from: "<쓸만한 컴뱃 오더스> 스킬 사용 가능", to: "기타" },
+            { from: "<쓸만한 헤이스트> 스킬 사용 가능", to: "기타" },
+            { from: "<쓸만한 윈드 부스터> 스킬 사용 가능", to: "기타" },
+            { from: "<쓸만한 샤프 아이즈> 스킬 사용 가능", to: "기타" },
         ];
     
         for (const replacement of replacements) {
@@ -361,7 +444,46 @@ export default function Stats_Equipment({ocid}) {
         }
         return option; 
     }
-    
+
+    const getAddOptionByClass = (characterClass, itemAddOption, baseEquipmentLevel, item) => {
+        switch (characterClass) {
+            case '궁수':
+                return (Number(itemAddOption.dex) + Number(itemAddOption.attack_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
+            case '전사':
+                return (Number(itemAddOption.str) + Number(itemAddOption.attack_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
+            case '도적':
+                return (Number(itemAddOption.luk) + Number(itemAddOption.attack_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
+            case '마법사':
+                return (Number(itemAddOption.int) + Number(itemAddOption.magic_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
+            case '해적(STR)':
+                return (Number(itemAddOption.str) + Number(itemAddOption.attack_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
+            case '해적(DEX)':
+                return (Number(itemAddOption.dex) + Number(itemAddOption.attack_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
+            case '제논':
+                return (Math.floor((Number(itemAddOption.str) + Number(itemAddOption.dex) + Number(itemAddOption.luk) + 
+                    Number(itemAddOption.attack_power) * 5 + Number(itemAddOption.all_stat) * 20) / 2)).toString() + "급";
+            case '데벤져':
+                const maxHp = Number(itemAddOption.max_hp);
+                let hpGrade = '';
+                let levelMultiplier = baseEquipmentLevel.base_equipment_level;
+                if (item.item_name.startsWith("에테르넬")) {
+                    if (maxHp === 2100) hpGrade = 'HP 5추';
+                    else if (maxHp === 2800) hpGrade = 'HP 4추';
+                    else if (maxHp === 3500) hpGrade = 'HP 3추';
+                    else if (maxHp === 4200) hpGrade = 'HP 2추';
+                    else if (maxHp === 4900) hpGrade = 'HP 1추';
+                } else {
+                    if (maxHp === levelMultiplier * 9) hpGrade = 'HP 5추';
+                    else if (maxHp === levelMultiplier * 12) hpGrade = 'HP 4추';
+                    else if (maxHp === levelMultiplier * 15) hpGrade = 'HP 3추';
+                    else if (maxHp === levelMultiplier * 18) hpGrade = 'HP 2추';
+                    else if (maxHp === levelMultiplier * 21) hpGrade = 'HP 1추';
+                }
+                return hpGrade;
+            default:
+              return 0;
+        }
+    };
 
     useEffect(() => {
         fetchUserData();
@@ -586,36 +708,89 @@ export default function Stats_Equipment({ocid}) {
                   <EquipmentPresetButton onClick = {() => {equipmentPresetChange("3")}} selected = {selectedEquipmentPreset === "3"} style = {{border: "none"}}>프리셋 3</EquipmentPresetButton>
               </EquipmentPresetBox>
               <EquipmentBox>
-                  {currentEquipmentPreset && currentEquipmentPreset.map((item, index) => (
-                      <EquipmentInfoBox key = {index} marginBottom = {index === currentEquipmentPreset.length - 1 ? '5vh' : '0'}>
-                          <TopBox>
-                              <EquipmentImageBox>
-                                  <EquipmentImage EquipmentImg = {item.item_icon}></EquipmentImage>
-                              </EquipmentImageBox>
-                              <EquipmentDetailInfoBox>
-                                  <EquipmentPartTitle>{item.item_equipment_slot}</EquipmentPartTitle>
-                                  <EquipmentName>{item.item_name}</EquipmentName>
-                                  <Equipment_SF_AddOp_Box>
-                                      <StarForce>★ {item.starforce}</StarForce>
-                                  </Equipment_SF_AddOp_Box>
-                              </EquipmentDetailInfoBox>
-                          </TopBox>
-                          <BottomBox>
-                              <PotentialBox>
-                                  <PotentialTitle>잠재</PotentialTitle>
-                                  <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_1)}</PotentialInfo>
-                                  <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_2)}</PotentialInfo>
-                                  <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_3)}</PotentialInfo>
-                              </PotentialBox>
-                              <PotentialBox>
-                                  <PotentialTitle>에디</PotentialTitle>
-                                  <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_1)}</PotentialInfo>
-                                  <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_2)}</PotentialInfo>
-                                  <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_3)}</PotentialInfo>
-                              </PotentialBox>
-                          </BottomBox>
-                      </EquipmentInfoBox>
-                  ))}
+                  {currentEquipmentPreset && currentEquipmentPreset.map((item, index) => {
+                      const addOp = getAddOptionByClass(characterClass, item.item_add_option, item.item_base_option, item);
+
+                      const hiddenBox = !(noAddnoStar.some(prefix => item.item_equipment_slot.startsWith(prefix)) ||
+                          (item.item_equipment_part === "반지" && item.item_description && SeedRing.some(prefix => item.item_description.startsWith(prefix))) ||
+                          pendantName.includes(item.item_name) || EventRing.includes(item.item_name)); 
+
+                      return (
+                        <EquipmentInfoBox key = {index}>
+                            <TopBox>
+                                <EquipmentImageBox>
+                                    <EquipmentImage EquipmentImg = {item.item_icon}></EquipmentImage>
+                                </EquipmentImageBox>
+                                <EquipmentDetailInfoBox>
+                                    <EquipmentPartTitle>{item.item_equipment_slot}</EquipmentPartTitle>
+                                    <EquipmentName hiddenBoxStyle = {hiddenBox}>{item.item_name}</EquipmentName>
+                                    {hiddenBox &&                                      
+                                        <Equipment_SF_AddOp_Box>
+                                            {item.item_equipment_slot !== "포켓 아이템" &&
+                                                <StarForce starforceScrollFlag = {item.starforce_scroll_flag}>★ {item.starforce}</StarForce>}
+                                            {!noAddOp.some(prefix => item.item_equipment_slot.startsWith(prefix)) && <AddOptionBox>{addOp}</AddOptionBox>}
+                                        </Equipment_SF_AddOp_Box>
+                                    }
+                                </EquipmentDetailInfoBox>
+                            </TopBox>
+                            <BottomBox>
+                                {item.potential_option_grade !== null && item.additional_potential_option_grade !== null ? (
+                                    <>
+                                        <PotentialBox>
+                                            <PotentialTitle>잠재</PotentialTitle>
+                                            <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_1)}</PotentialInfo>
+                                            <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_2)}</PotentialInfo>
+                                            <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_3)}</PotentialInfo>
+                                        </PotentialBox>
+                                        <PotentialBox>
+                                            <PotentialTitle>에디</PotentialTitle>
+                                            <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_1)}</PotentialInfo>
+                                            <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_2)}</PotentialInfo>
+                                            <PotentialInfo grade = {item.additional_potential_option_grade}>{transformPotentialOption(item.additional_potential_option_3)}</PotentialInfo>
+                                        </PotentialBox>
+                                    </>
+                                ) : item.potential_option_grade !== null && item.additional_potential_option_grade === null ? (
+                                    <>
+                                        <PotentialBox>
+                                            <PotentialTitle>잠재</PotentialTitle>
+                                            <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_1)}</PotentialInfo>
+                                            <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_2)}</PotentialInfo>
+                                            <PotentialInfo grade = {item.potential_option_grade}>{transformPotentialOption(item.potential_option_3)}</PotentialInfo>
+                                        </PotentialBox>
+                                        <NoAddPotentialBox>에디셔널 잠재능력이 없습니다.</NoAddPotentialBox>
+                                    </>
+                                ) : (<NoPotentialBox>잠재능력 설정이 불가능한 장비입니다.</NoPotentialBox>)}
+                            </BottomBox>
+                        </EquipmentInfoBox>
+                      );})}
+                  <EquipmentInfoBox>
+                      <TopBox>
+                          <EquipmentImageBox>
+                              {equipmentInfo.title && <EquipmentImage EquipmentImg = {equipmentInfo.title.title_icon} />}
+                          </EquipmentImageBox>
+                          <EquipmentDetailInfoBox>
+                              <EquipmentPartTitle>칭호</EquipmentPartTitle>
+                              {equipmentInfo.title && <EquipmentName>{equipmentInfo.title.title_name}</EquipmentName>}
+                          </EquipmentDetailInfoBox>
+                      </TopBox>
+                      <BottomBox>
+                          <NoPotentialBox>잠재능력 설정이 불가능한 장비입니다.</NoPotentialBox>
+                      </BottomBox>
+                  </EquipmentInfoBox>
+                  <EquipmentInfoBox style = {{marginBottom: "2.5%"}}>
+                      <TopBox>
+                          <EquipmentImageBox>
+                              <EquipmentImage EquipmentImg = {charAndroid.android_icon}></EquipmentImage>
+                          </EquipmentImageBox>
+                          <EquipmentDetailInfoBox>
+                              <EquipmentPartTitle>안드로이드</EquipmentPartTitle>
+                              <EquipmentName>{charAndroid.android_name}</EquipmentName>
+                          </EquipmentDetailInfoBox>
+                      </TopBox>
+                      <BottomBox>
+                          <NoPotentialBox>잠재능력 설정이 불가능한 장비입니다.</NoPotentialBox>
+                      </BottomBox>
+                  </EquipmentInfoBox>
               </EquipmentBox>
           </EquipmentContainer>
       </Container>
@@ -623,25 +798,31 @@ export default function Stats_Equipment({ocid}) {
 }
 
 const Container = styled.div` // 최상위 부모 컨테이너
+    display: flex;
     width: 100%;
 `;
 
 const StatContainer = styled.div` // 최상위 컨테이너 내부의 스탯 컨테이너
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
     width: 25%;
-    margin-right: 4%;
+    margin-right: 1%;
     margin-bottom: 2.5%;
     border-radius: 10px;
     border: 2px solid #DDE3E9;
+    max-height: 500px;
+    overflow-y: auto;
 `;
 
 const EquipmentContainer = styled.div` // 최상위 컨테이너 내부의 장비 컨테이너
-    display: inline-flex;
+    display: flex;
     flex-direction: column;
-    width: 70%;
+    width: 74%;
     border-radius: 10px;
     border: 2px solid #DDE3E9;
+    margin-bottom: 2.5%;
+    max-height: 500px;
+    overflow-y: auto;
 `;
 
 const StatTitle = styled.div` // 스탯 컨테이너 내부의 최상단 제목 컴포넌트
@@ -986,26 +1167,32 @@ const EquipmentName = styled.div` // 장비 상세정보 박스 내부의 장비
     text-align: center;
     line-height: 3vh;
     border-bottom: 1px solid #DDE3E9;
+
+    ${props => !props.hiddenBoxStyle && `
+        height: 6vh;
+        line-height: 6vh;
+        border: none;
+    `}
 `;
 
 const Equipment_SF_AddOp_Box = styled.div` // 장비 상세정보 박스 내부의 스타포스&추가옵션 박스
-    diaplay: flex;
+    display: flex;
     width: 100%;
     height: 3vh;
 `;
 
 const StarForce = styled.div` // 스타포스&추가옵션 박스 내부의 스타포스 정보
-    width: 20%;
+    width: 25%;
     height: 2vh;
     border-radius: 3px;
-    background-color: #F5EDE1;
-    color: #F6A730;
+    background-color: ${props => props.starforceScrollFlag === '사용' ? '#F0F3F5' : '#F5EDE1'};
+    color: ${props => props.starforceScrollFlag === '사용' ? '#7FC3FF' : '#F6A730'};
     font-size: 12.5px;
     font-weight: bold;
     text-align: center;
     line-height: 2vh;
     margin-top: 0.4vh;
-    margin-left: 10%;
+    margin-left: 15%;
 `;
 
 const BottomBox = styled.div` // 장비 상세정보 박스 내부의 하단 박스
@@ -1054,4 +1241,38 @@ const PotentialInfo = styled.div` // 잠재능력 박스 내부의 잠재능력 
                 return "transparent";
         }
     }};
+`;
+
+const AddOptionBox = styled.div` // 스타포스&추가옵션 박스 내부의 추옵 정보
+    width: 25%;
+    height: 2vh;
+    border-radius: 3px;
+    background-color: #F5F5F5;
+    color: #666A7A;
+    font-size: 12.5px;
+    font-weight: bold;
+    text-align: center;
+    line-height: 2vh;
+    margin-top: 0.4vh;
+    margin-left: 15%;
+`;
+
+const NoAddPotentialBox = styled.div`
+    width: 100%;
+    height: 3vh;
+    font-size: 10px;
+    text-align: center;
+    line-height: 3vh;
+    background-color: #ECEFF7;
+`;
+
+const NoPotentialBox = styled.div`
+    width: 100%;
+    height: 6vh;
+    background-color: #ECEFF7;
+    border-radius: 0px 0px 5px 5px;
+    border-bottom: 1px solid #DDE3E9;
+    font-size: 10px;
+    text-align: center;
+    line-height: 6vh;
 `;
