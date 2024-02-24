@@ -130,9 +130,63 @@ const className = {
     엔젤릭버스터: Angelic_buster,
     아크: Ark,
 };
+const jobClass = {
+    warrior: ['초보자', '히어로', '팔라딘', '다크나이트', '소울마스터', '미하일', '블래스터', '데몬슬레이어', '아란', '카이저', '아델', '제로'],
+    archer: ['보우마스터', '신궁', '패스파인더', '윈드브레이커', '와일드헌터', '메르세데스', '카인'],
+    mage: ['아크메이지(불,독)', '아크메이지(썬,콜)', '비숍', '플레임위자드', '배틀메이지', '에반', '루미너스', '일리움', '라라', '키네시스'],
+    thief: ['나이트로드', '섀도어', '듀얼블레이더', '나이트워커', '팬텀', '카데나', '칼리', '호영'],
+    strpirate: ['바이퍼', '캐논마스터', '스트라이커', '은월', '아크'],
+    dexpirate: ['캡틴', '메카닉', '엔젤릭버스터'],
+    demonavenger: ['데몬어벤져'],
+    xenon: ['제논'],
+};
+const jobStatMap = {
+    warrior: ['str', 'attack_power', 'all_stat'],
+    strpirate: ['str', 'attack_power', 'all_stat'],
+    archer: ['dex', 'attack_power', 'all_stat'],
+    dexpirate: ['dex', 'attack_power', 'all_stat'],
+    mage: ['int', 'magic_power', 'all_stat'],
+    thief: ['luk', 'attack_power', 'all_stat'],
+    xenon: ['str', 'dex', 'luk', 'attack_power', 'all_stat'],
+    demonavenger: ['max_hp'],
+};
 
+const seedring = [
+    '크라이시스-H링',
+    '크라이시스-M링',
+    '듀라빌리티 링',
+    '리커버디펜스 링',
+    '버든리프트 링',
+    '리스크테이커 링',
+    '크라이시스-MH링',
+    '리스트레인트 링',
+    '오버패스 링',
+    '리플렉티브 링',
+    '실드스와프 링',
+    '마나컷 링',
+    '리밋 링',
+    '헬스컷 링',
+    '크리디펜스 링',
+    '크리데미지 링',
+    '크리쉬프트 링',
+    '스탠스쉬프트 링',
+    '리커버스탠스 링',
+    '스위프트 링',
+    '웨폰퍼프-S 링',
+    '웨폰퍼프-D 링',
+    '웨폰퍼프-I 링',
+    '웨폰퍼프-L 링',
+    '레벨퍼프-S 링',
+    '레벨퍼프-D 링',
+    '레벨퍼프-I 링',
+    '레벨퍼프-L 링',
+    '링 오브 썸',
+    '타워인핸스 링',
+    '얼티메이덤 링',
+    '컨티뉴어스 링',
+];
 export default function StatEquip() {
-    const maple_api = process.env.REACT_APP_NEXON_OPEN_API1;
+    const maple_api = process.env.REACT_APP_NEXON_OPEN_API2;
 
     //스탯정보 저장 변수
     const [cp, setCp] = useState(null); //전투력
@@ -209,6 +263,7 @@ export default function StatEquip() {
     const [preset2Equip, setPreset2Equip] = useState([]);
     const [preset3Equip, setPreset3Equip] = useState([]);
     const [selectEquipPreset, setSelectEquipPreset] = useState(0);
+    const [job, setJob] = useState(null);
     const EquipPresets = [preset1Equip, preset2Equip, preset3Equip]; // 프리셋 배열
 
     const handleEquipPresetClick = (presetIndex) => {
@@ -229,7 +284,7 @@ export default function StatEquip() {
 
     useEffect(() => {
         fetchUserData();
-    });
+    }, []);
 
     const fetchUserData = async () => {
         try {
@@ -386,24 +441,9 @@ export default function StatEquip() {
             const { ability_preset_1, ability_preset_2, ability_preset_3 } = getCharacterAbility.data;
 
             // 각 프리셋의 ability_info 배열에서 필요한 정보 추출
-            setPreset1Abilities(
-                ability_preset_1.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
-                    return { ability_no, ability_grade, ability_value };
-                })
-            );
-
-            setPreset2Abilities(
-                ability_preset_2.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
-                    return { ability_no, ability_grade, ability_value };
-                })
-            );
-
-            setPreset3Abilities(
-                ability_preset_3.ability_info.map(({ ability_no, ability_grade, ability_value }) => {
-                    return { ability_no, ability_grade, ability_value };
-                })
-            );
-
+            setPreset1Abilities(ability_preset_1.ability_info);
+            setPreset2Abilities(ability_preset_2.ability_info);
+            setPreset3Abilities(ability_preset_3.ability_info);
             //하이퍼스탯 불러오기
             const getHyperStat = await axios.get(
                 `https://open.api.nexon.com/maplestory/v1/character/hyper-stat?ocid=${ocid}&date=${usingday}
@@ -415,23 +455,9 @@ export default function StatEquip() {
             );
             const { hyper_stat_preset_1, hyper_stat_preset_2, hyper_stat_preset_3 } = getHyperStat.data;
 
-            setPreset1Hyper(
-                hyper_stat_preset_1.map(({ stat_type, stat_point, stat_level, stat_increase }) => {
-                    return { stat_type, stat_point, stat_level, stat_increase };
-                })
-            );
-
-            setPreset2Hyper(
-                hyper_stat_preset_2.map(({ stat_type, stat_point, stat_level, stat_increase }) => {
-                    return { stat_type, stat_point, stat_level, stat_increase };
-                })
-            );
-
-            setPreset3Hyper(
-                hyper_stat_preset_3.map(({ stat_type, stat_point, stat_level, stat_increase }) => {
-                    return { stat_type, stat_point, stat_level, stat_increase };
-                })
-            );
+            setPreset1Hyper(hyper_stat_preset_1);
+            setPreset2Hyper(hyper_stat_preset_2);
+            setPreset3Hyper(hyper_stat_preset_3);
             // 장비 불러오기
             const getEquip = await axios.get(`https://open.api.nexon.com/maplestory/v1/character/item-equipment?ocid=${ocid}&date=${usingday}`, {
                 headers: { 'x-nxopen-api-key': maple_api },
@@ -439,6 +465,7 @@ export default function StatEquip() {
 
             const data = getEquip.data;
             const etcOptions = [
+                '피격 시 20% 확률로 25의 데미지 무시',
                 '공격 시 3% 확률로 47의 HP 회복',
                 '피격 시 30% 확률로 51의 데미지 무시',
                 '피격 시 20% 확률로 38의 데미지 무시',
@@ -487,6 +514,9 @@ export default function StatEquip() {
                             }
                             if (newEquip[option] && newEquip[option].includes('크리티컬 확률')) {
                                 newEquip[option] = newEquip[option].replace('크리티컬 확률', '크확');
+                            }
+                            if (newEquip[option] && newEquip[option].includes('몬스터 방어율 무시')) {
+                                newEquip[option] = newEquip[option].replace('몬스터 방어율 무시', '방무');
                             }
                             if (newEquip[option] && newEquip[option].includes('크리티컬 데미지')) {
                                 newEquip[option] = newEquip[option].replace('크리티컬 데미지', '크뎀');
@@ -538,8 +568,81 @@ export default function StatEquip() {
             setPreset1Equip(presetEquipments[0]);
             setPreset2Equip(presetEquipments[1]);
             setPreset3Equip(presetEquipments[2]);
+            console.log(getEquip.data.character_class);
+            setJob(getEquip.data.character_class);
         } catch (error) {
             console.log(error.response);
+        }
+    };
+
+    const calculateStat = (stat, job, equipName, equipLevel, equipHpRate) => {
+        const { str = 0, dex = 0, int = 0, luk = 0, attack_power = 0, magic_power = 0, all_stat = 0, max_hp = 0 } = stat;
+
+        if (jobClass.demonavenger.includes(job)) {
+            const equipHp = equipHpRate; // HP 비율을 바탕으로 장비 HP 계산
+
+            if (equipName.includes('혼테일의 목걸이') || equipName.includes('카오스 혼테일의 목걸이')) {
+                switch (equipHp) {
+                    case 1800:
+                        return 'HP 1추';
+                    case 1550:
+                        return 'HP 2추';
+                    case 1080:
+                        return 'HP 3추';
+                    default:
+                        return ' ';
+                }
+            } else if (equipName.includes('에테르넬')) {
+                const option = equipHp / (2.8 * equipLevel);
+                switch (option) {
+                    case 7:
+                        return 'HP 1추';
+                    case 6:
+                        return 'HP 2추';
+                    case 5:
+                        return 'HP 3추';
+                    case 4:
+                        return 'HP 4추';
+                    case 3:
+                        return 'HP 5추';
+                    default:
+                        return ' ';
+                }
+            } else {
+                const option = equipHp / (3 * equipLevel);
+                switch (option) {
+                    case 7:
+                        return 'HP 1추';
+                    case 6:
+                        return 'HP 2추';
+                    case 5:
+                        return 'HP 3추';
+                    case 4:
+                        return 'HP 4추';
+                    case 3:
+                        return 'HP 5추';
+                    default:
+                        return ' ';
+                }
+            }
+        } else if (jobClass.xenon.includes(job)) {
+            // 제논 계산식
+            return (str + dex + luk + attack_power * 7 + all_stat * 20) / 2 + '급';
+        } else if (jobClass.warrior.includes(job) || jobClass.strpirate.includes(job)) {
+            // 전사, 힘해적 계산식
+            return str + attack_power * 4 + all_stat * 10 + '급';
+        } else if (jobClass.archer.includes(job) || jobClass.dexpirate.includes(job)) {
+            // 궁수, 덱해적 계산식
+            return dex + attack_power * 4 + all_stat * 10 + '급';
+        } else if (jobClass.mage.includes(job)) {
+            // 마법사 계산식
+            return int + magic_power * 4 + all_stat * 10 + '급';
+        } else if (jobClass.thief.includes(job)) {
+            // 도적 계산식
+            return luk + attack_power * 4 + all_stat * 10 + '급';
+        } else {
+            // 기본 계산식
+            return str + dex + int + luk + (attack_power || magic_power) * 4 + all_stat * 10 + '급';
         }
     };
 
@@ -553,7 +656,6 @@ export default function StatEquip() {
                         <Cpname>전투력</Cpname> <Cpinfo> {formatNumber(cp)} </Cpinfo>
                     </CPContainer>
                 </MergeContainer>
-
                 <StatContainer>
                     <Stname>스탯 공격력</Stname>
                     <Stinfo>
@@ -749,7 +851,6 @@ export default function StatEquip() {
                         <Dstatinfo> {apMp}</Dstatinfo>
                     </DetailedStatContainer>
                 </StatBorderContainer>
-
                 <StatBorderContainer>
                     <ButtonBorder>
                         어빌리티
@@ -821,48 +922,88 @@ export default function StatEquip() {
                         <PresetBt onClick={() => handleEquipPresetClick(1)} isSelected={selectEquipPreset == 1}>
                             프리셋 2
                         </PresetBt>
+
                         <PresetBt onClick={() => handleEquipPresetClick(2)} isSelected={selectEquipPreset == 2}>
                             프리셋 3
                         </PresetBt>
                     </ButtonBorder>
                 </TitleText>
                 <EquipInnerContainer>
-                    {EquipPresets[selectEquipPreset].map((equip, index) => (
-                        <EquipContainer key={index}>
-                            <EquipUpContainer>
-                                <EquipImgContainer imgUrl={equip.item_icon} />
-                                <EquipRightContainer>
-                                    <EquipPartContainer>{equip.item_equipment_part}</EquipPartContainer>
-                                    <EquipNameContainer>{equip.item_name}</EquipNameContainer>
-                                    <EquipInfoContainer>
-                                        {equip.starforce != 0 && <Starforce starforceScrollFlag={equip.starforce_scroll_flag}>★{equip.starforce}</Starforce>}
-                                        {/* <AdditionalOptions>급</AdditionalOptions> */}
-                                    </EquipInfoContainer>
-                                </EquipRightContainer>
-                            </EquipUpContainer>
-                            {equip.potential_option_1 ||
-                            equip.potential_option_2 ||
-                            equip.potential_option_3 ||
-                            equip.additional_potential_option_1 ||
-                            equip.additional_potential_option_2 ||
-                            equip.additional_potential_option_3 ? (
-                                <EquipDownContainer>
-                                    <UpperContainer>
-                                        <UpperName>잠재</UpperName>
-                                        {equip.potential_option_1 && <UpperOption>{equip.potential_option_1}</UpperOption>}
-                                        {equip.potential_option_2 && <UpperOption>{equip.potential_option_2}</UpperOption>}
-                                        {equip.potential_option_3 && <UpperOption>{equip.potential_option_3}</UpperOption>}
-                                    </UpperContainer>
-                                    <LowerContainer>
-                                        <LowerName>에디</LowerName>
-                                        {equip.additional_potential_option_1 && <LowerOption>{equip.additional_potential_option_1}</LowerOption>}
-                                        {equip.additional_potential_option_2 && <LowerOption>{equip.additional_potential_option_2}</LowerOption>}
-                                        {equip.additional_potential_option_3 && <LowerOption>{equip.additional_potential_option_3}</LowerOption>}
-                                    </LowerContainer>
-                                </EquipDownContainer>
-                            ) : null}
-                        </EquipContainer>
-                    ))}
+                    {EquipPresets[selectEquipPreset].map((equip, index) => {
+                        let jobCategory;
+                        for (const [category, jobs] of Object.entries(jobClass)) {
+                            if (jobs.includes(job)) {
+                                jobCategory = category;
+                                break;
+                            }
+                        }
+
+                        if (!jobCategory) {
+                            console.error(`Unknown job: ${job}`);
+                            return;
+                        }
+
+                        const jobStats = jobStatMap[jobCategory]; // 직업 클래스에 해당하는 스탯 배열을 가져옴
+                        if (!jobStats) {
+                            console.error(`Unknown job category: ${jobCategory}`);
+                            return;
+                        }
+
+                        const jobStat = Object.keys(equip.item_add_option)
+                            .filter((key) => jobStats.includes(key) && parseInt(equip.item_add_option[key]) !== 0)
+                            .reduce((obj, key) => {
+                                obj[key] = parseInt(equip.item_add_option[key]); // 문자열을 숫자로 변환
+                                return obj;
+                            }, {});
+
+                        let calculatedStat = calculateStat(jobStat, job, equip.item_name, equip.item_base_option.base_equipment_level, equip.item_add_option.max_hp);
+                        if (seedring.includes(equip.item_name)) {
+                            calculatedStat = equip.special_ring_level + 'Lv';
+                        }
+
+                        return (
+                            <EquipContainer key={index}>
+                                <HoverDiv>
+                                    안녕하세요{equip.item_add_option.max_hp},{equip.item_base_option.base_equipment_level}
+                                </HoverDiv>
+                                <EquipUpContainer>
+                                    <EquipImgContainer imgUrl={equip.item_icon} />
+                                    <EquipRightContainer>
+                                        <EquipPartContainer>{equip.item_equipment_part}</EquipPartContainer>
+                                        <EquipNameContainer>{equip.item_name}</EquipNameContainer>
+                                        <EquipInfoContainer>
+                                            {equip.starforce != 0 && <Starforce starforceScrollFlag={equip.starforce_scroll_flag}>★{equip.starforce}</Starforce>}
+                                            {calculatedStat !== '0급' && !['무기'].includes(equip.item_equipment_slot) && <AdditionalOptions>{calculatedStat}</AdditionalOptions>}
+                                        </EquipInfoContainer>
+                                    </EquipRightContainer>
+                                </EquipUpContainer>
+                                {equip.potential_option_1 ||
+                                equip.potential_option_2 ||
+                                equip.potential_option_3 ||
+                                equip.additional_potential_option_1 ||
+                                equip.additional_potential_option_2 ||
+                                equip.additional_potential_option_3 ? (
+                                    <EquipDownContainer>
+                                        <UpperContainer>
+                                            <UpperName>잠재</UpperName>
+                                            {equip.potential_option_1 && <UpperOption grade={equip.potential_option_grade}>{equip.potential_option_1}</UpperOption>}
+                                            {equip.potential_option_2 && <UpperOption grade={equip.potential_option_grade}>{equip.potential_option_2}</UpperOption>}
+                                            {equip.potential_option_3 && <UpperOption grade={equip.potential_option_grade}>{equip.potential_option_3}</UpperOption>}
+                                        </UpperContainer>
+                                        <LowerContainer>
+                                            <LowerName>에디</LowerName>
+                                            {equip.additional_potential_option_1 && <LowerOption grade={equip.additional_potential_option_grade}>{equip.additional_potential_option_1}</LowerOption>}
+                                            {equip.additional_potential_option_2 && <LowerOption grade={equip.additional_potential_option_grade}>{equip.additional_potential_option_2}</LowerOption>}
+                                            {equip.additional_potential_option_3 && <LowerOption grade={equip.additional_potential_option_grade}>{equip.additional_potential_option_3}</LowerOption>}
+                                        </LowerContainer>
+                                    </EquipDownContainer>
+                                ) : null}
+                                {/* <EquipUpContainer>
+                                    <EquipImgContainer imgUrl={equip.title.title_icon} />
+                                </EquipUpContainer> */}
+                            </EquipContainer>
+                        );
+                    })}
                 </EquipInnerContainer>
             </RightContainer>
         </Container>
@@ -896,7 +1037,7 @@ const LeftContainer = styled.div`
     //왼쪽 컨테이너 (스탯)
     flex-direction: column;
     border: 2px solid #dde3e9;
-    width: 20%;
+    width: 21%;
     border-radius: 8px;
     margin-right: 0.7vw;
 `;
@@ -1048,7 +1189,7 @@ const EquipInnerContainer = styled.div`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: 31.5% 31.5% 31.5%;
-    grid-template-rows: 12% 12% 12%;
+    grid-template-rows: 12.5% 12.5% 12.5%;
     justify-content: space-evenly;
 `;
 //장비창 전체 컨테이너
@@ -1059,19 +1200,21 @@ const EquipContainer = styled.div`
     border: 2px solid #dde3e9;
     margin-top: 2.5vh;
     width: 100%;
+    position: relative;
 `;
 //위쪽 장비 컨테이너
 const EquipUpContainer = styled.div`
     display: flex;
-    border-bottom: 2px solid #dde3e9;
     font-size: 0.69vw;
     align-items: center;
     height: 9vh;
+    padding-top: 10px;
 `;
 //아래쪽 장비 컨테이너
 const EquipDownContainer = styled.div`
     display: flex;
     flex-direction: column;
+    border-top: 2px solid #dde3e9;
 `;
 //위쪽 오른쪽 컨테이너
 const EquipRightContainer = styled.div`
@@ -1111,9 +1254,10 @@ const EquipInfoContainer = styled.div`
 `;
 //스타포스
 const Starforce = styled.div`
-    background-color: rgba(255, 248, 232);
+    background-color: ${(props) => (props.starforceScrollFlag === '사용' ? 'rgba(240,243,245),' : 'rgba(255, 248, 232)')};
     margin-right: 8px;
     color: ${(props) => (props.starforceScrollFlag === '사용' ? 'rgba(127,195,255)' : 'rgba(246, 167, 48)')};
+
     border-radius: 5px;
     margin: 2px;
 `;
@@ -1138,6 +1282,22 @@ const UpperName = styled.div`
 `;
 const UpperOption = styled.div`
     margin-right: 10px;
+    background-color: '#FAFAFA';
+
+    color: ${(props) => {
+        switch (props.grade) {
+            case '레전드리':
+                return '#5CB85C';
+            case '유니크':
+                return '#F6A730';
+            case '에픽':
+                return '#6D62A1';
+            case '레어':
+                return '#72A6D3';
+            default:
+                return 'transparent';
+        }
+    }};
 `;
 
 //아랫잠
@@ -1153,4 +1313,32 @@ const LowerName = styled.div`
 
 const LowerOption = styled.div`
     margin-right: 10px;
+    background-color: '#FAFAFA';
+    color: ${(props) => {
+        switch (props.grade) {
+            case '레전드리':
+                return '#5CB85C';
+            case '유니크':
+                return '#F6A730';
+            case '에픽':
+                return '#6D62A1';
+            case '레어':
+                return '#72A6D3';
+            default:
+                return 'transparent';
+        }
+    }};
+`;
+
+const HoverDiv = styled.div`
+    display: none;
+    position: absolute;
+    top: 0px; // 필요에 따라 조정하세요
+    z-index: 1;
+    color: white;
+    background-color: rgba(43, 43, 43);
+
+    ${EquipContainer}:hover & {
+        display: block;
+    }
 `;

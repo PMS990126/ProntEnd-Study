@@ -42,7 +42,7 @@ const worldMark = {
 };
 
 export default function CharacterPage() {
-    const maple_api = process.env.REACT_APP_NEXON_OPEN_API1;
+    const maple_api = process.env.REACT_APP_NEXON_OPEN_API2;
     const navigate = useNavigate();
     const prevOcidRef = useRef();
 
