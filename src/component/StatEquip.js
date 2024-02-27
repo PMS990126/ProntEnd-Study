@@ -56,6 +56,25 @@ import Ark from '../picture/class/Ark.png';
 
 import Beginner from '../picture/class/Beginner.png';
 
+import frame_top from '../picture/item/frame-top.png';
+import frame_dotline from '../picture/item/frame-dotline.png';
+import item_cover from '../picture/item/item-cover.png';
+import item_shade from '../picture/item/item-shade.png';
+import item_base from '../picture/item/item-base.png';
+
+import item_rare from '../picture/item/item-rare.png';
+import item_epic from '../picture/item/item-epic.png';
+import item_unique from '../picture/item/item-unique.png';
+import item_legendary from '../picture/item/item-legendary.png';
+
+import rare from '../picture/item/rare.png';
+import epic from '../picture/item/epic.png';
+import unique from '../picture/item/unique.png';
+import legendary from '../picture/item/legendary.png';
+
+import starforce from '../picture/item/starforce.png';
+import star from '../picture/item/star.png';
+
 function formatNumber(num) {
     let strNum = String(num);
     let billion = '';
@@ -582,12 +601,13 @@ export default function StatEquip() {
             const equipHp = equipHpRate; // HP 비율을 바탕으로 장비 HP 계산
 
             if (equipName.includes('혼테일의 목걸이') || equipName.includes('카오스 혼테일의 목걸이')) {
-                switch (equipHp) {
-                    case 1800:
+                const option = equipHp / (3 * equipLevel);
+                switch (option) {
+                    case 5:
                         return 'HP 1추';
-                    case 1550:
+                    case 4:
                         return 'HP 2추';
-                    case 1080:
+                    case 3:
                         return 'HP 3추';
                     default:
                         return ' ';
@@ -645,6 +665,22 @@ export default function StatEquip() {
             return str + dex + int + luk + (attack_power || magic_power) * 4 + all_stat * 10 + '급';
         }
     };
+    let maxStarforce = 0;
+    function getStarForce(level) {
+        if (level < 95) {
+            maxStarforce = 5;
+        } else if (level < 108) {
+            maxStarforce = 8;
+        } else if (level < 118) {
+            maxStarforce = 10;
+        } else if (level < 128) {
+            maxStarforce = 15;
+        } else if (level < 138) {
+            maxStarforce = 20;
+        } else {
+            maxStarforce = 25;
+        }
+    }
 
     return (
         <Container>
@@ -963,9 +999,13 @@ export default function StatEquip() {
 
                         return (
                             <EquipContainer key={index}>
-                                <HoverDiv>
-                                    안녕하세요{equip.item_add_option.max_hp},{equip.item_base_option.base_equipment_level}
-                                </HoverDiv>
+                                <HoverCover>
+                                    <HoverDiv>
+                                        <HoverEquipName>{equip.item_name}</HoverEquipName>
+                                        <HoverImg imgUrl={equip.item_icon} Source={equip.item_equipment_part} />
+                                        <HoverStarforce></HoverStarforce>
+                                    </HoverDiv>
+                                </HoverCover>
                                 <EquipUpContainer>
                                     <EquipImgContainer imgUrl={equip.item_icon} />
                                     <EquipRightContainer>
@@ -998,9 +1038,6 @@ export default function StatEquip() {
                                         </LowerContainer>
                                     </EquipDownContainer>
                                 ) : null}
-                                {/* <EquipUpContainer>
-                                    <EquipImgContainer imgUrl={equip.title.title_icon} />
-                                </EquipUpContainer> */}
                             </EquipContainer>
                         );
                     })}
@@ -1334,7 +1371,6 @@ const HoverDiv = styled.div`
     display: none;
     position: absolute;
     top: 0px; // 필요에 따라 조정하세요
-    z-index: 1;
     color: white;
     background-color: rgba(43, 43, 43);
 
@@ -1342,3 +1378,25 @@ const HoverDiv = styled.div`
         display: block;
     }
 `;
+const HoverCover = styled.div`
+    background-image: url(${item_cover});
+    width: 100%;
+`;
+const HoverStarforce = styled.div``;
+const HoverEquipName = styled.div``;
+const HoverEquipGrade = styled.div``;
+const HoverImgLvContainer = styled.div``;
+const HoverLv = styled.div``;
+const HoverImg = styled.div`
+    box-sizing: border-box;
+    background-image: url(${item_unique}), url(${item_cover}), url(${(props) => props.imgUrl}), url(${item_base});
+    background-size: contain, 88%, ${(props) => (props.Source === '얼굴장식' || props.Source === '눈장식' || props.Source === '하의' || props.Source === '신발' ? '55%' : '68%')}, 88%;
+    background-repeat: no-repeat;
+    padding: 20px;
+    background-position: 4.56px 4.56px, center, center, center;
+    width: 3vw;
+    height: 3vw;
+`;
+const HoverStat = styled.div``;
+const HoverUpStat = styled.div``;
+const HoverDownStat = styled.div``;
