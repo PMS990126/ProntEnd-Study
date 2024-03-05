@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useEffect } from 'react';
 import axios from 'axios';
+import ReactDOM from 'react-dom';
 
 import Hero from '../picture/class/Hero.png';
 import Paladin from '../picture/class/Paladin.png';
@@ -300,6 +301,26 @@ export default function StatEquip() {
     let currentPath = window.location.pathname;
     let parts = currentPath.split('/');
     let ocid = parts[2]; //URL의 파리미터에서 ocid(식별자)를 가져옴
+
+    const [hoverIndex, setHoverIndex] = useState(null);
+    const [hoverDivStyle, setHoverDivStyle] = useState({ top: '18vh', bottom: 'auto' });
+
+    const handleMouseEnter = (index, e) => {
+        setHoverIndex(index);
+        const viewportHeight = window.innerHeight;
+        const hoverDivHeight = (18 * viewportHeight) / 100; // 18vh를 픽셀로 변환
+        if (e.clientY < viewportHeight / 2) {
+            // 마우스 포인터가 뷰포트의 상단 절반에 있으면 HoverDiv를 아래로 표시
+            setHoverDivStyle({ top: '18vh', bottom: 'auto' });
+        } else {
+            // 마우스 포인터가 뷰포트의 하단 절반에 있으면 HoverDiv를 위로 표시
+            setHoverDivStyle({ top: 'auto', bottom: '18vh' });
+        }
+    };
+
+    const handleMouseLeave = () => {
+        setHoverIndex(null);
+    };
 
     useEffect(() => {
         fetchUserData();
@@ -665,6 +686,7 @@ export default function StatEquip() {
             return str + dex + int + luk + (attack_power || magic_power) * 4 + all_stat * 10 + '급';
         }
     };
+
     let maxStarforce = 0;
     function getStarForce(level) {
         if (level < 95) {
@@ -680,6 +702,23 @@ export default function StatEquip() {
         } else {
             maxStarforce = 25;
         }
+    }
+    const starWidth = 50;
+    function renderStars(maxStarforce) {
+        const rows = Math.ceil(maxStarforce / 5); // 줄 수 계산
+        const stars = Array.from({ length: maxStarforce });
+
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {Array.from({ length: rows }).map((_, rowIndex) => (
+                    <div key={rowIndex} style={{ display: 'flex', marginBottom: rowIndex < rows - 1 ? '20px' : '0' }}>
+                        {stars.slice(rowIndex * 5, (rowIndex + 1) * 5).map((_, starIndex) => (
+                            <img key={starIndex} src={star} alt="star" style={{ width: `${starWidth}px`, marginRight: starIndex < 4 ? '10px' : '0' }} />
+                        ))}
+                    </div>
+                ))}
+            </div>
+        );
     }
 
     return (
@@ -966,6 +1005,7 @@ export default function StatEquip() {
                 </TitleText>
                 <EquipInnerContainer>
                     {EquipPresets[selectEquipPreset].map((equip, index) => {
+                        const top = index % 2 === 0 ? '100%' : '-100%'; // 짝수 인덱스는 아래, 홀수 인덱스는 위
                         let jobCategory;
                         for (const [category, jobs] of Object.entries(jobClass)) {
                             if (jobs.includes(job)) {
@@ -996,16 +1036,185 @@ export default function StatEquip() {
                         if (seedring.includes(equip.item_name)) {
                             calculatedStat = equip.special_ring_level + 'Lv';
                         }
+                        const maxStarforce = getStarForce(equip.item_base_option.base_equipment_level);
 
                         return (
-                            <EquipContainer key={index}>
-                                <HoverCover>
-                                    <HoverDiv>
+                            <EquipContainer key={index} onMouseEnter={(e) => handleMouseEnter(index, e)} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
+                                {' '}
+                                <HoverDiv show={hoverIndex === index} zIndex={hoverIndex === index ? 5 : 4} {...hoverDivStyle}>
+                                    <HoverCover></HoverCover>
+                                    <HoverStarforce>{renderStars(maxStarforce)}</HoverStarforce>
+                                    <NameUpgrade>
                                         <HoverEquipName>{equip.item_name}</HoverEquipName>
+                                        {equip.scroll_upgrade != 0 && (
+                                            <HoverEquipName>
+                                                {'(+'}
+                                                {equip.scroll_upgrade}
+                                                {')'}
+                                            </HoverEquipName>
+                                        )}
+                                    </NameUpgrade>
+                                    <HoverEquipGrade>
+                                        {'('}
+                                        {equip.potential_option_grade}
+                                        {' 아이템)'}
+                                    </HoverEquipGrade>
+
+                                    <HoverDotline> </HoverDotline>
+                                    <HoverImgLvContainer>
                                         <HoverImg imgUrl={equip.item_icon} Source={equip.item_equipment_part} />
-                                        <HoverStarforce></HoverStarforce>
-                                    </HoverDiv>
-                                </HoverCover>
+                                        <HoverLv>{equip.item_base_option.base_equipment_level}</HoverLv>
+                                    </HoverImgLvContainer>
+                                    <HoverDotline> </HoverDotline>
+                                    <HoverEquipslot>장비분류 : {equip.item_equipment_part}</HoverEquipslot>
+                                    <HoverStat>
+                                        <RowContainer>
+                                            {equip.item_total_option.str != 0 && <HoverTotalStat>STR : +{equip.item_total_option.str} </HoverTotalStat>}
+                                            {equip.item_total_option.str != 0 && <HoverBaseStat>{'(' + equip.item_base_option.str} </HoverBaseStat>}
+                                            {equip.item_add_option.str != 0 && <HoverAddStat>{'+' + equip.item_add_option.str} </HoverAddStat>}
+                                            {equip.item_etc_option.str != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.str} </HoverEtcStat>}
+                                            {equip.item_starforce_option.str != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.str} </HoverStarforceStat>}
+                                            {equip.item_total_option.str != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.dex != 0 && <HoverTotalStat>DEX : +{equip.item_total_option.dex} </HoverTotalStat>}
+                                            {equip.item_total_option.dex != 0 && <HoverBaseStat>{'(' + equip.item_base_option.dex} </HoverBaseStat>}
+                                            {equip.item_add_option.dex != 0 && <HoverAddStat>{'+' + equip.item_add_option.dex} </HoverAddStat>}
+                                            {equip.item_etc_option.dex != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.dex} </HoverEtcStat>}
+                                            {equip.item_starforce_option.dex != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.dex} </HoverStarforceStat>}
+                                            {equip.item_total_option.dex != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.int != 0 && <HoverTotalStat>INT : +{equip.item_total_option.int} </HoverTotalStat>}
+                                            {equip.item_total_option.int != 0 && <HoverBaseStat>{'(' + equip.item_base_option.int} </HoverBaseStat>}
+                                            {equip.item_add_option.int != 0 && <HoverAddStat>{'+' + equip.item_add_option.int} </HoverAddStat>}
+                                            {equip.item_etc_option.int != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.int} </HoverEtcStat>}
+                                            {equip.item_starforce_option.int != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.int} </HoverStarforceStat>}
+                                            {equip.item_total_option.int != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.luk != 0 && <HoverTotalStat>LUK : +{equip.item_total_option.luk} </HoverTotalStat>}
+                                            {equip.item_total_option.luk != 0 && <HoverBaseStat>{'(' + equip.item_base_option.luk} </HoverBaseStat>}
+                                            {equip.item_add_option.luk != 0 && <HoverAddStat>{'+' + equip.item_add_option.luk} </HoverAddStat>}
+                                            {equip.item_etc_option.luk != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.luk} </HoverEtcStat>}
+                                            {equip.item_starforce_option.luk != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.luk} </HoverStarforceStat>}
+                                            {equip.item_total_option.luk != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.max_hp != 0 && <HoverTotalStat>최대 HP : +{equip.item_total_option.max_hp} </HoverTotalStat>}
+                                            {equip.item_total_option.max_hp != 0 && <HoverBaseStat>{'(' + equip.item_base_option.max_hp} </HoverBaseStat>}
+                                            {equip.item_add_option.max_hp != 0 && <HoverAddStat>{'+' + equip.item_add_option.max_hp} </HoverAddStat>}
+                                            {equip.item_etc_option.max_hp != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.max_hp} </HoverEtcStat>}
+                                            {equip.item_starforce_option.max_hp != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.max_hp} </HoverStarforceStat>}
+                                            {equip.item_total_option.max_hp != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.max_mp != 0 && <HoverTotalStat>최대 MP : +{equip.item_total_option.max_mp} </HoverTotalStat>}
+                                            {equip.item_total_option.max_mp != 0 && <HoverBaseStat>{'(' + equip.item_base_option.max_mp} </HoverBaseStat>}
+                                            {equip.item_add_option.max_mp != 0 && <HoverAddStat>{'+' + equip.item_add_option.max_mp} </HoverAddStat>}
+                                            {equip.item_etc_option.max_mp != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.max_mp} </HoverEtcStat>}
+                                            {equip.item_starforce_option.max_mp != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.max_mp} </HoverStarforceStat>}
+                                            {equip.item_total_option.max_mp != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.attack_power != 0 && <HoverTotalStat>공격력 : +{equip.item_total_option.attack_power} </HoverTotalStat>}
+                                            {equip.item_total_option.attack_power != 0 && <HoverBaseStat>{'(' + equip.item_base_option.attack_power} </HoverBaseStat>}
+                                            {equip.item_add_option.attack_power != 0 && <HoverAddStat>{'+' + equip.item_add_option.attack_power} </HoverAddStat>}
+                                            {equip.item_etc_option.attack_power != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.attack_power} </HoverEtcStat>}
+                                            {equip.item_starforce_option.attack_power != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.attack_power} </HoverStarforceStat>}
+                                            {equip.item_total_option.attack_power != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.magic_power != 0 && <HoverTotalStat>마력 : +{equip.item_total_option.magic_power} </HoverTotalStat>}
+                                            {equip.item_total_option.magic_power != 0 && <HoverBaseStat>{'(' + equip.item_base_option.magic_power} </HoverBaseStat>}
+                                            {equip.item_add_option.magic_power != 0 && <HoverAddStat>{'+' + equip.item_add_option.magic_power} </HoverAddStat>}
+                                            {equip.item_etc_option.magic_power != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.magic_power} </HoverEtcStat>}
+                                            {equip.item_starforce_option.magic_power != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.magic_power} </HoverStarforceStat>}
+                                            {equip.item_total_option.magic_power != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.armor != 0 && <HoverTotalStat>방어력 : +{equip.item_total_option.armor} </HoverTotalStat>}
+                                            {equip.item_total_option.armor != 0 && <HoverBaseStat>{'(' + equip.item_base_option.armor} </HoverBaseStat>}
+                                            {equip.item_add_option.armor != 0 && <HoverAddStat>{'+' + equip.item_add_option.armor} </HoverAddStat>}
+                                            {equip.item_etc_option.armor != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.armor} </HoverEtcStat>}
+                                            {equip.item_starforce_option.armor != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.armor} </HoverStarforceStat>}
+                                            {equip.item_total_option.armor != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.speed != 0 && <HoverTotalStat>이동속도 : +{equip.item_total_option.speed} </HoverTotalStat>}
+                                            {equip.item_total_option.speed != 0 && <HoverBaseStat>{'(' + equip.item_base_option.speed} </HoverBaseStat>}
+                                            {equip.item_add_option.speed != 0 && <HoverAddStat>{'+' + equip.item_add_option.speed} </HoverAddStat>}
+                                            {equip.item_etc_option.speed != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.speed} </HoverEtcStat>}
+                                            {equip.item_starforce_option.speed != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.speed} </HoverStarforceStat>}
+                                            {equip.item_total_option.speed != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.jump != 0 && <HoverTotalStat> 점프력 : +{equip.item_total_option.jump} </HoverTotalStat>}
+                                            {equip.item_total_option.jump != 0 && <HoverBaseStat>{'(' + equip.item_base_option.jump} </HoverBaseStat>}
+                                            {equip.item_add_option.jump != 0 && <HoverAddStat>{'+' + equip.item_add_option.jump} </HoverAddStat>}
+                                            {equip.item_etc_option.jump != 0 && <HoverEtcStat>{'+' + equip.item_etc_option.jump} </HoverEtcStat>}
+                                            {equip.item_starforce_option.jump != 0 && <HoverStarforceStat>{'+' + equip.item_starforce_option.jump} </HoverStarforceStat>}
+                                            {equip.item_total_option.jump != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.boss_damage != 0 && <HoverTotalStat> 보스 몬스터 공격시 데미지 : +{equip.item_total_option.boss_damage}% </HoverTotalStat>}
+                                            {equip.item_total_option.boss_damage != 0 && <HoverBaseStat>{'(' + equip.item_base_option.boss_damage}% </HoverBaseStat>}
+                                            {equip.item_add_option.boss_damage != 0 && <HoverAddStat>{'+' + equip.item_add_option.boss_damage}% </HoverAddStat>}
+                                            {equip.item_total_option.boss_damage != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.ignore_monster_armor != 0 && (
+                                                <HoverBaseStat> 몬스터 방어율 무시 : +{equip.item_total_option.ignore_monster_armor}% </HoverBaseStat>
+                                            )}
+                                        </RowContainer>
+                                        <RowContainer>
+                                            {equip.item_total_option.all_stat != 0 && <HoverTotalStat> 올스탯 : +{equip.item_total_option.all_stat}% </HoverTotalStat>}
+                                            {equip.item_total_option.all_stat != 0 && <HoverBaseStat>{'(' + equip.item_base_option.all_stat}% </HoverBaseStat>}
+                                            {equip.item_add_option.all_stat != 0 && <HoverAddStat>{'+' + equip.item_add_option.all_stat}% </HoverAddStat>}
+                                            {equip.item_total_option.all_stat != 0 && <HoverBaseStat>{')'}</HoverBaseStat>}
+                                        </RowContainer>
+                                        <UpgredeRepair>
+                                            <HoverBaseStat>업그레이드 가능 횟수:{equip.scroll_upgradeable_count}</HoverBaseStat>
+                                            <HoverStarforceStat>
+                                                {'('}복구가능 횟수:{equip.scroll_resilience_count}
+                                                {')'}
+                                            </HoverStarforceStat>
+                                        </UpgredeRepair>
+                                        <HoverBaseStat>{equip.golden_hammer_flag === '적용' && '황금망치 제련성공'}</HoverBaseStat>
+                                        <CuttableCount>가위 사용 가능 횟수:{equip.cuttable_count}회</CuttableCount>
+                                    </HoverStat>
+                                    {equip.potential_option_1 || equip.potential_option_2 || equip.potential_option_3 ? (
+                                        <>
+                                            <HoverDotline> </HoverDotline>
+                                            <HoverUp>
+                                                <RowContainer>
+                                                    <GradeIcon grade={equip.potential_option_grade}></GradeIcon>
+                                                    <HoverUpName grade={equip.potential_option_grade}>잠재 옵션</HoverUpName>
+                                                </RowContainer>
+                                                <HoverUpStat>
+                                                    {equip.potential_option_1 && <HoverUpStat>{equip.potential_option_1}</HoverUpStat>}
+                                                    {equip.potential_option_2 && <HoverUpStat>{equip.potential_option_2}</HoverUpStat>}
+                                                    {equip.potential_option_3 && <HoverUpStat>{equip.potential_option_3}</HoverUpStat>}
+                                                </HoverUpStat>
+                                            </HoverUp>
+                                            <HoverDotline> </HoverDotline>
+                                        </>
+                                    ) : null}
+
+                                    {equip.additional_potential_option_1 || equip.additional_potential_option_2 || equip.additional_potential_option_3 ? (
+                                        <HoverDown>
+                                            <RowContainer>
+                                                <GradeIcon grade={equip.additional_potential_option_grade}></GradeIcon>
+                                                <HoverDownName grade={equip.additional_potential_option_grade}>에디셔널 잠재 옵션</HoverDownName>
+                                            </RowContainer>
+                                            <HoverDownStat>
+                                                {equip.additional_potential_option_1 && <HoverDownStat>{equip.additional_potential_option_1}</HoverDownStat>}
+                                                {equip.additional_potential_option_2 && <HoverDownStat>{equip.additional_potential_option_2}</HoverDownStat>}
+                                                {equip.additional_potential_option_3 && <HoverDownStat>{equip.additional_potential_option_3}</HoverDownStat>}
+                                            </HoverDownStat>
+                                        </HoverDown>
+                                    ) : null}
+                                </HoverDiv>
                                 <EquipUpContainer>
                                     <EquipImgContainer imgUrl={equip.item_icon} />
                                     <EquipRightContainer>
@@ -1225,11 +1434,14 @@ const EquipInnerContainer = styled.div`
     width: 100%;
     box-sizing: border-box;
     display: grid;
+    position: relative;
     grid-template-columns: 31.5% 31.5% 31.5%;
     grid-template-rows: 12.5% 12.5% 12.5%;
     justify-content: space-evenly;
+    z-index: 1;
 `;
-//장비창 전체 컨테이너
+
+// 장비창 전체 컨테이너
 const EquipContainer = styled.div`
     box-sizing: border-box;
     background-color: white;
@@ -1237,7 +1449,9 @@ const EquipContainer = styled.div`
     border: 2px solid #dde3e9;
     margin-top: 2.5vh;
     width: 100%;
+    height: 18vh;
     position: relative;
+    z-index: 2; // 추가
 `;
 //위쪽 장비 컨테이너
 const EquipUpContainer = styled.div`
@@ -1368,35 +1582,181 @@ const LowerOption = styled.div`
 `;
 
 const HoverDiv = styled.div`
-    display: none;
+    display: ${(props) => (props.show ? 'block' : 'none')};
     position: absolute;
-    top: 0px; // 필요에 따라 조정하세요
+    top: ${(props) => props.top};
+    bottom: ${(props) => props.bottom};
     color: white;
-    background-color: rgba(43, 43, 43);
+    background-color: #2b2b2b;
+    width: 18vw;
+    height: auto;
+    align-items: center;
+    border: white 5px solid;
+    z-index: ${(props) => (props.zIndex ? props.zIndex : 4)};
+    border-left: 1px white solid;
+    border-right: 1px white solid;
+    box-shadow: inset 0 0 0 1px white, 0 0 0 1px #2b2b2b;
+`;
 
-    ${EquipContainer}:hover & {
-        display: block;
-    }
-`;
 const HoverCover = styled.div`
-    background-image: url(${item_cover});
+    background-image: url(${frame_top});
+    background-size: cover;
+    background-position: center;
+    padding: 1px;
     width: 100%;
+    height: 100%;
+    background-repeat: no-repeat;
 `;
-const HoverStarforce = styled.div``;
-const HoverEquipName = styled.div``;
-const HoverEquipGrade = styled.div``;
-const HoverImgLvContainer = styled.div``;
+const HoverDotline = styled.div`
+    background: url(${frame_dotline});
+    background-size: cover;
+    background-position: center;
+    padding: 1px;
+    width: 100%;
+
+    background-repeat: no-repeat;
+`;
+const HoverStarforce = styled.div`
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+`;
+const NameUpgrade = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+const HoverEquipName = styled.div`
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+`;
+const HoverEquipGrade = styled.div`
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+`;
+const HoverImgLvContainer = styled.div`
+    display: flex;
+    align-items: center;
+`;
 const HoverLv = styled.div``;
 const HoverImg = styled.div`
+    margin: 1px;
     box-sizing: border-box;
     background-image: url(${item_unique}), url(${item_cover}), url(${(props) => props.imgUrl}), url(${item_base});
     background-size: contain, 88%, ${(props) => (props.Source === '얼굴장식' || props.Source === '눈장식' || props.Source === '하의' || props.Source === '신발' ? '55%' : '68%')}, 88%;
     background-repeat: no-repeat;
     padding: 20px;
+    margin-left: 16px;
+    margin-right: 20px;
+    margin-top: 8px;
+    margin-bottom: 8px;
     background-position: 4.56px 4.56px, center, center, center;
     width: 3vw;
     height: 3vw;
 `;
-const HoverStat = styled.div``;
+const HoverEquipslot = styled.div`
+    padding-top: 10px;
+    padding-left: 16px;
+`;
+
+const HoverStat = styled.div`
+    display: flex;
+    flex-direction: column;
+    padding-left: 16px;
+`;
+const RowContainer = styled.div`
+    display: flex;
+    align-items: center;
+`;
+const HoverTotalStat = styled.div`
+    display: flex;
+    color: #61f4f4;
+`;
+const HoverBaseStat = styled.div``;
+const HoverAddStat = styled.div`
+    display: flex;
+    color: #bbe904;
+`;
+const HoverEtcStat = styled.div`
+    display: flex;
+    color: #a0a0ee;
+`;
+const HoverStarforceStat = styled.div`
+    display: flex;
+    color: #e5b807;
+`;
+const UpgredeRepair = styled.div`
+    display: flex;
+`;
+const CuttableCount = styled.div`
+    display: flex;
+    padding-bottom: 10px;
+    color: #e5b807;
+`;
+const GradeIcon = styled.div`
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    background-size: contain;
+    background-image: ${(props) => {
+        switch (props.grade) {
+            case '레전드리':
+                return `url(${legendary})`;
+            case '유니크':
+                return `url(${unique})`;
+            case '에픽':
+                return `url(${epic})`;
+            case '레어':
+                return `url(${rare})`;
+            default:
+                return '';
+        }
+    }};
+`;
+
+const HoverUp = styled.div`
+    padding-left: 16px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+`;
 const HoverUpStat = styled.div``;
+const HoverUpName = styled.div`
+    color: ${(props) => {
+        switch (props.grade) {
+            case '레전드리':
+                return '#C4F402';
+            case '유니크':
+                return '#F3C305';
+            case '에픽':
+                return '#A1A1F0';
+            case '레어':
+                return '#61F4F4';
+            default:
+                return 'transparent';
+        }
+    }};
+`;
+const HoverDown = styled.div`
+    padding-left: 16px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+`;
 const HoverDownStat = styled.div``;
+const HoverDownName = styled.div`
+    color: ${(props) => {
+        switch (props.grade) {
+            case '레전드리':
+                return '#C4F402';
+            case '유니크':
+                return '#F3C305';
+            case '에픽':
+                return '#A1A1F0';
+            case '레어':
+                return '#61F4F4';
+            default:
+                return 'transparent';
+        }
+    }};
+`;
