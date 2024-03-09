@@ -51,6 +51,17 @@ import Wild_Hunter from "../images/Wild_Hunter.png";
 import Wind_Breaker from "../images/Wind_Breaker.png";
 import Xenon from "../images/Xenon.png";
 import Zero from "../images/Zero.png";
+import Background_Cover from "../images/Background_Cover.png";
+import Epic_Cover from "../images/Epic_Cover.png";
+import Legendary_Cover from "../images/Legendary_Cover.png";
+import Light_Effect from "../images/Light_Effect.png";
+import Rare_Cover from "../images/Rare_Cover.png";
+import Unique_Cover from "../images/Unique_Cover.png";
+import Item_Class from "../images/Item_Class.png";
+import Epic_Grade from "../images/Epic_Grade.png";
+import Legendary_Grade from "../images/Legendary_Grade.png";
+import Rare_Grade from "../images/Rare_Grade.png";
+import Unique_Grade from "../images/Unique_Grade.png";
 
 export default function Stats_Equipment({ocid}) {
 
@@ -169,6 +180,34 @@ export default function Stats_Equipment({ocid}) {
     const EventRing = ["오닉스 링", "벤젼스 링", "코스모스 링", "SS급 마스터 쥬얼링", "결속의 반지", "제로 그라테스링",
                       "어드벤쳐 크리티컬링", "어드벤쳐 다크 크리티컬링", "다크 어드벤쳐 크리티컬링", "어드벤쳐 딥다크 크리티컬링",
                       "카오스 링", "테네브리스 원정대 반지", "글로리온 링 : 슈프림", "어웨이크 링", "이터널 플레임 링", "어비스 헌터스 링"];
+    
+    const TransformOptionTitle = {
+        str: 'STR',
+        dex: 'DEX',
+        int: 'INT',
+        luk: 'LUK',
+        max_hp: '최대 HP',
+        max_mp: '최대 MP',
+        attack_power: '공격력',
+        magic_power: '마력',
+        armor: '방어력',
+        speed: '이동속도',
+        jump: '점프력',
+        boss_damage: '보스 몬스터 공격 시 데미지',
+        ignore_monster_armor: '몬스터 방어율 무시',
+        all_stat: '올스탯',
+        damage: '데미지',
+        equipment_level_decrease: '착용 레벨 감소',
+        max_hp_rate: '최대 HP(%)',
+        max_mp_rate: '최대 MP(%)',
+    };
+
+    const HPMP  = {
+        max_hp: '최대 HP',
+        max_mp: '최대 MP',
+        max_hp_rate: '최대 HP(%)',
+        max_mp_rate: '최대 MP(%)',
+    }
 
     const NEXON_OPEN_API_KEY = process.env.REACT_APP_NEXON_OPEN_API_KEY; // 넥슨 오픈 Api key
 
@@ -445,7 +484,7 @@ export default function Stats_Equipment({ocid}) {
         return option; 
     }
 
-    const getAddOptionByClass = (characterClass, itemAddOption, baseEquipmentLevel, item) => {
+    const getAddOptionByClass = (characterClass, itemAddOption, baseEquipmentLevel, item) => { // 추옵 계산 메서드
         switch (characterClass) {
             case '궁수':
                 return (Number(itemAddOption.dex) + Number(itemAddOption.attack_power) * 4 + Number(itemAddOption.all_stat) * 10).toString() + "급";
@@ -483,6 +522,33 @@ export default function Stats_Equipment({ocid}) {
             default:
               return 0;
         }
+    };
+
+    const getStarCount = (level) => { // 장비 레벨별 스타포스 최대 수치 계산 메서드
+        if (level <= 94) return 5;
+        if (level <= 107) return 8;
+        if (level <= 117) return 10;
+        if (level <= 127) return 15;
+        if (level <= 137) return 20;
+        return 25;
+    };
+
+    const StarForceEA = ({current, color, level}) => { // 스타포스 추가 메서드
+        let stars = [];
+        let starCount = getStarCount(level);
+        for (let i = 1; i <= starCount; i++) {
+            stars.push(
+                <Star key={i} current={current} index={i} color={color}>
+                    ★
+                </Star>
+            );
+            if (i % 15 === 0) {
+                stars.push(<LineBreak key={'br' + i} />);
+            } else if (i % 5 === 0) {
+                stars.push(<Space key={'space1' + i} />);
+            }
+        }
+        return <StarForceContainer>{stars}</StarForceContainer>;
     };
 
     useEffect(() => {
@@ -717,6 +783,128 @@ export default function Stats_Equipment({ocid}) {
 
                       return (
                         <EquipmentInfoBox key = {index}>
+                            <HoverItemInfo TopHover = {index >= 12}>
+                                {(hiddenBox && item.item_equipment_slot !== "포켓 아이템") || item.item_equipment_part === "블레이드" ?
+                                    <StarForceEA current = {parseInt(item.starforce)} 
+                                    color = {item.starforce_scroll_flag === '사용' ? '#7FC3FF' : '#FFBB00'} 
+                                    level = {item.item_base_option.base_equipment_level}/> : null
+                                }
+                                {item.item_equipment_slot === "무기" && <SoulName>{item.soul_name.split("소")[0]}</SoulName>}
+                                <ItemName>
+                                    {item.item_name}&nbsp;
+                                    {(hiddenBox && item.item_equipment_slot !== "포켓 아이템") || item.item_equipment_part === "블레이드" ? 
+                                        `(+${item.scroll_upgrade})` : null
+                                    }
+                                </ItemName>
+                                {item.potential_option_grade &&
+                                    <ItemGrade>
+                                        {item.potential_option_grade === "레전드리" && "(레전드리 아이템)"}
+                                        {item.potential_option_grade === "유니크" && "(유니크 아이템)"}
+                                        {item.potential_option_grade === "에픽" && "(에픽 아이템)"}
+                                        {item.potential_option_grade === "레어" && "(레어 아이템)"}
+                                    </ItemGrade>
+                                }
+                                <OutsideBorderBox>
+                                    <InsideBorderBox>
+                                        <ItemImageContainer grade = {item.potential_option_grade} icon = {item.item_icon}></ItemImageContainer>
+                                        <ItemInfoBox>
+                                            <AttackPowerIncrease>
+                                                <div>공격력 증가량</div>
+                                                <div style = {{color: "white", fontSize: "25px", fontFamily: "maple-font"}}>0</div>
+                                            </AttackPowerIncrease>
+                                            <ItemLevel>■ REQ LEV : {item.item_base_option.base_equipment_level}</ItemLevel>
+                                            <ItemStatCondition>
+                                                ■ REQ STR : 000<span style ={{marginRight: "27px"}}></span>■ REQ LUK : 000 <br/>
+                                                ■ REQ DEX : 000<span style ={{marginRight: "25.8px"}}></span>■ REQ INT : 000
+                                            </ItemStatCondition>
+                                        </ItemInfoBox>
+                                    </InsideBorderBox>
+                                    <ItemClassImg></ItemClassImg>
+                                </OutsideBorderBox>
+                                <BottomBorder></BottomBorder>
+                                <ItemDetailInfo>장비분류 : {item.item_equipment_part}</ItemDetailInfo>
+                                <ItemDetailInfo>
+                                    {Object.entries(item.item_total_option).map(([key, value]) => {
+                                        if(parseInt(value) !== 0) {
+                                            return <ItemContent key = {key}>
+                                                       <Info totalColor = {
+                                                           (key in item.item_etc_option && item.item_etc_option[key] !== "0") ||
+                                                           (key in item.item_add_option && item.item_add_option[key] !== "0") ||
+                                                           (key in item.item_starforce_option && item.item_starforce_option[key] !== "0")}>
+                                                               {`${TransformOptionTitle[key]} : +${value}${
+                                                               ["boss_damage", "ignore_monster_armor", "all_stat", "damage", "max_hp_rate", "max_mp_rate"].includes(key) ? "%" : ""}`}
+                                                       </Info>
+                                                       <Info>
+                                                           {(key !== 'ignore_monster_armor' && key !== 'damage') && 
+                                                           (item.item_equipment_slot && !noAddnoStar.includes(item.item_equipment_slot) || item.item_equipment_part === "블레이드") &&
+                                                           !(item.item_equipment_part === "반지" && item.item_description && SeedRing.some(description => item.item_description.includes(description))) &&
+                                                           !Object.keys(HPMP).includes(key) && 
+                                                               ` (${item.item_base_option[key]}${key === "boss_damage" ? "%" : ""}`
+                                                           }
+                                                       </Info>
+                                                       <Info style = {{color: "#A8A8FC"}}>
+                                                           {(key in item.item_etc_option && item.item_etc_option[key] !== "0") && ` +${item.item_etc_option[key]}`}
+                                                       </Info>
+                                                       <Info style = {{color: "#CAFD01"}}>
+                                                           {(key in item.item_add_option && item.item_add_option[key] !== "0") && 
+                                                               ` +${item.item_add_option[key]}${["boss_damage", "all_stat", "damage"].includes(key) ? "%" : ""}`
+                                                           }
+                                                       </Info>
+                                                       <Info style = {{color: "#F9C803"}}>
+                                                           {(key in item.item_starforce_option && item.item_starforce_option[key] !== "0") && ` +${item.item_starforce_option[key]}`}
+                                                       </Info>
+                                                       <Info>
+                                                           {item.item_equipment_slot && !noAddnoStar.includes(item.item_equipment_slot) &&
+                                                           !(item.item_equipment_part === "반지" && item.item_description && 
+                                                           SeedRing.some(description => item.item_description.includes(description))) &&
+                                                           (key !== 'ignore_monster_armor') && !Object.keys(HPMP).includes(key) &&
+                                                               `)`
+                                                           }
+                                                       </Info>
+                                                   </ItemContent>
+                                        } return null;
+                                    })}
+                                </ItemDetailInfo>
+                                {item.scroll_upgrade !== "0" && item.scroll_upgradeable_count !== "0" && item.scroll_resilience_count !== "0" && (
+                                    <ItemDetailInfo>       
+                                        <Info>업그레이드 가능 횟수 : {item.scroll_upgradeable_count}&nbsp;</Info>
+                                        <Info style = {{color: "#FFCC02"}}>&nbsp;(복구 가능 횟수 : {item.scroll_resilience_count})</Info>                                                     
+                                    </ItemDetailInfo>
+                                )}
+                                {item.golden_hammer_flag === "적용" && (
+                                    <ItemDetailInfo>황금망치 재련 적용</ItemDetailInfo>
+                                )}
+                                {item.cuttable_count !== "255" && (
+                                    <ItemDetailInfo style = {{color: "#FFCC02"}}>가위 사용 가능 횟수 : {item.cuttable_count}회</ItemDetailInfo>
+                                )}
+                                {item.potential_option_grade === null && item.additional_potential_option_grade === null && (
+                                    <EnterBox/>
+                                )}
+                                {item.potential_option_grade !== null && (
+                                    <OutsideBorderBox style = {item.additional_potential_option_grade === null ? {marginBottom: "10px"} : {}}>
+                                        <BottomBorder></BottomBorder>
+                                        <ItemPotentialTitle>
+                                            <GradeImg grade = {item.potential_option_grade}/>
+                                            <PG_Title grade = {item.potential_option_grade}>잠재 옵션</PG_Title>
+                                        </ItemPotentialTitle>
+                                        <PotentialInfoBox>{item.potential_option_1}</PotentialInfoBox>
+                                        <PotentialInfoBox>{item.potential_option_2}</PotentialInfoBox>
+                                        <PotentialInfoBox>{item.potential_option_3}</PotentialInfoBox>
+                                    </OutsideBorderBox>
+                                )}
+                                {item.additional_potential_option_grade !== null && (
+                                <OutsideBorderBox style = {{marginBottom: "10px"}}>
+                                    <BottomBorder></BottomBorder>
+                                    <ItemPotentialTitle>
+                                        <GradeImg grade = {item.additional_potential_option_grade}/>
+                                        <PG_Title grade = {item.additional_potential_option_grade}>에디셔널 잠재 옵션</PG_Title>
+                                    </ItemPotentialTitle>
+                                    <PotentialInfoBox>{item.additional_potential_option_1}</PotentialInfoBox>
+                                    <PotentialInfoBox>{item.additional_potential_option_1}</PotentialInfoBox>
+                                    <PotentialInfoBox>{item.additional_potential_option_1}</PotentialInfoBox>
+                                </OutsideBorderBox>
+                                )}
+                            </HoverItemInfo>
                             <TopBox>
                                 <EquipmentImageBox>
                                     <EquipmentImage EquipmentImg = {item.item_icon}></EquipmentImage>
@@ -1116,6 +1304,7 @@ const EquipmentInfoBox = styled.div` // 장비 박스 내부의 장비 상세정
     margin-top: 2.5%;
     margin-left: 2.5%;
     background-color: white;
+    position: relative;
 `;
 
 const TopBox = styled.div` // 장비 상세정보 박스 내부의 상단 박스
@@ -1257,7 +1446,7 @@ const AddOptionBox = styled.div` // 스타포스&추가옵션 박스 내부의 �
     margin-left: 15%;
 `;
 
-const NoAddPotentialBox = styled.div`
+const NoAddPotentialBox = styled.div` // 에디셔널잠재능력이 없는 경우 렌더링 되는 컴포넌트
     width: 100%;
     height: 3vh;
     font-size: 10px;
@@ -1266,7 +1455,7 @@ const NoAddPotentialBox = styled.div`
     background-color: #ECEFF7;
 `;
 
-const NoPotentialBox = styled.div`
+const NoPotentialBox = styled.div` // 윗잠, 에디 둘 다 없는 경우 렌더링 되는 컴포넌트
     width: 100%;
     height: 6vh;
     background-color: #ECEFF7;
@@ -1275,4 +1464,233 @@ const NoPotentialBox = styled.div`
     font-size: 10px;
     text-align: center;
     line-height: 6vh;
+`;
+
+const HoverItemInfo = styled.div` // 아이템 호버 최상위 컨테이너
+    display: none;
+    position: absolute;
+    z-index: 100;
+    top: ${props => props.TopHover ? 'auto' : '100%'}; 
+    bottom: ${props => props.TopHover ? '100%' : 'auto'}; 
+    color: white;
+    background-color: #2B2B2B;
+    border-radius: 5px;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 2px #000;
+    width: 100%;
+
+    ${EquipmentInfoBox}:hover & {
+        display: block;
+    }
+`;
+
+const StarForceContainer = styled.div` // 아이템 호버 컨테이너 내부의 스타포스 컨테이너 
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    height: 5vh;
+    white-space: pre;
+    justify-content: center;
+    font-size: 12.5px;
+    color: #667788;
+    text-shadow: -0.5px 0 white, 0 0.5px white, 0.5px 0 white, 0 -0.5px white;
+    text-align: center;
+    margin-top: 5px;
+`;
+
+const Star = styled.span` // 스타포스 별 아이콘
+    color: ${({ current, index, color }) => (current >= index ? color : '#667788')};
+`;
+
+const Space = styled.span` // 스타포스 5개마다 공백
+    width: 5px;
+    display: inline-block;
+`;
+
+const LineBreak = styled.div` // 스타포스 15개 이 후 개행
+    flex-basis: 100%;
+    height: 0;
+`;
+
+const SoulName = styled.div` // 아이템 호버 컨테이너 내부의 무기 소울명
+    width: 100%;
+    margin-top: 5px;
+    text-align: center;
+    font-size: 15px;
+    color: #CCFF00;
+`;
+
+const ItemName = styled.div` // 아이템 호버 컨테이너 내부의 장비명 
+    width: 100%;
+    margin-top: 5px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: bold;
+    color: #F43F5E;
+`;
+
+const ItemGrade = styled.div` // 아이템 호버 컨테이너 내부의 잠재능력 등급명
+    width: 100%;
+    margin-top: 5px;
+    text-align: center;
+    font-size: 12.5px;
+`;
+
+const OutsideBorderBox = styled.div` // 아이템 호버 컨테이너 내부의 바깥테두리 박스
+    width: 100%;
+    margin-top: 5px;
+    border-top: 1px dashed #000000;
+`;
+
+const InsideBorderBox = styled.div` // 바깥테두리 박스 내부의 안쪽테두리 박스
+    display: flex;
+    width: 100%;
+    font-size: 12.5px;
+    border-top: 1px dashed #4D4D4D;
+`;
+
+const ItemImageContainer = styled.div` // 안쪽테두리 박스 내부의 이미지 컨테이너 
+    width: 90px;
+    height: 90px;
+    margin-top: 5px;
+    margin-left: 10px;
+    background-size: 85% 85%, 60% 60%, contain, 90% 90%;
+    background-position: 2.5px 7px, 12.5px 20px, left, left;
+    background-repeat: no-repeat;
+
+    background-image: 
+        url(${Light_Effect}),
+        url(${props => props.icon}),
+        url(${props => {
+            switch (props.grade) {
+            case '레전드리':
+                return Legendary_Cover;
+            case '유니크':
+                return Unique_Cover;
+            case '에픽':
+                return Epic_Cover;
+            case '레어':
+                return Rare_Cover;
+            default:
+                return 'none';
+            }
+        }}), url(${Background_Cover});
+`;
+
+const ItemInfoBox = styled.div` // 안쪽테두리 박스 내부의 아이템 기타 정보박스
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    margin-top: 10px;
+`;
+
+const AttackPowerIncrease = styled.div` // 기타 정보박스 내부의 공격력 증가량 박스 
+    width: 100%;
+    text-align: right;
+    color: #999999;
+    font-size: 12px;
+`;
+
+const ItemLevel = styled.div` // 기타 정보박스 내부의 장비아이템 장착레벨
+    width: 100%;
+    margin-bottom: 5px;
+    color: #FFCC00;
+    font-size: 9px;
+`;
+
+const ItemStatCondition = styled.div` // 기타 정보박스 내부의 장비아이템 장착 스탯조건
+    width: 100%;
+    text-align: left;
+    color: #777777;
+    font-size: 9px;
+    line-height: 1;
+`;
+
+const ItemClassImg = styled.div` // 바깥테두리 박스 내부의 장비아이템 장착 직업조건
+    width: 99%;
+    height: 50px;
+    margin-left: 1%;
+    margin-bottom: 5px;
+    background-image: url(${Item_Class});
+    background-size: cover;
+`;
+
+const BottomBorder = styled.div` // 바깥테두리 박스 아래의 추가 구분선
+    width: 100%;
+    margin-bottom: 5px;
+    border-top: 1px dashed #4D4D4D;
+`;
+
+const ItemDetailInfo = styled.div` // 추가 구분선 아래의 장비 상세능력 정보 컴포넌트
+    width: 100%;
+    margin-left: 10px;
+    font-size: 12px;
+`;
+
+const ItemContent = styled.div` // 장비 상세능력 정보 컴포넌트 내부의 장비 상세능력치 박스
+    width: 100%;
+`;
+
+const Info = styled.span` // 장비 상세능력치 박스 내부의 장비 능력치 정보
+    width: 100%;
+    color: ${props => props.totalColor ? '#5EE9E9' : 'white'};
+`;
+
+const ItemPotentialTitle = styled.div` // 장비 잠재능력 제목 박스 
+    display: flex;
+    width: 100%;
+    height: 17.5px;
+`;
+
+const GradeImg = styled.div` // 잠재능력 등급 이미지
+    width: 15px;
+    height: 15px;
+    margin-left: 10px;
+    background-size: cover;
+
+    background-image: url(${props => {
+        switch (props.grade) {
+            case '레전드리':
+                return Legendary_Grade;
+            case '유니크':
+                return Unique_Grade;
+            case '에픽':
+                return Epic_Grade;
+            case '레어':
+                return Rare_Grade;
+            default:
+                return null;
+        }
+    }});
+`;
+
+const PG_Title = styled.div` // 잠재 능력 제목 컴포넌트
+    font-size: 12px;
+    margin-left: 2.5px;
+    padding-bottom: 1px;
+
+    color: ${props => {
+        switch (props.grade) {
+            case "레전드리":
+                return "#BFEE03";
+            case "유니크":
+                return "#FFCC02";
+            case "에픽":
+                return "#AAAAFF";
+            case "레어":
+                return "#64FFFF";
+            default:
+                return "transparent";
+        }
+    }};
+`;
+
+const PotentialInfoBox = styled.div` // 잠재 능력 제목 컴포넌트 아래의 잠재능력 정보
+    width: 100%;
+    margin-left: 10px;
+    font-size: 12.5px;
+`;
+
+const EnterBox = styled.div` // 공용 밑 여백 박스
+    width: 100%;
+    margin-bottom: 10px;
 `;
