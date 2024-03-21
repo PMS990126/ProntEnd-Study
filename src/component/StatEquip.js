@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { useEffect } from 'react';
 import axios from 'axios';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 
 import Hero from '../picture/class/Hero.png';
 import Paladin from '../picture/class/Paladin.png';
@@ -75,6 +76,7 @@ import legendary from '../picture/item/legendary.png';
 
 import starforce from '../picture/item/starforce.png';
 import star from '../picture/item/star.png';
+import superiror from '../picture/item/superior.png';
 
 import exceptional from '../picture/item/exceptional.png';
 
@@ -704,22 +706,44 @@ export default function StatEquip() {
         }
     };
 
-    let maxStarforce = 0;
     function getStarForce(level) {
         if (level < 95) {
-            maxStarforce = 5;
+            return 5;
         } else if (level < 108) {
-            maxStarforce = 8;
+            return 8;
         } else if (level < 118) {
-            maxStarforce = 10;
+            return 10;
         } else if (level < 128) {
-            maxStarforce = 15;
+            return 15;
         } else if (level < 138) {
-            maxStarforce = 20;
+            return 20;
         } else {
-            maxStarforce = 25;
+            return 25;
         }
     }
+    const Star = ({ current, index }) => {
+        const imageUrl = current >= index ? 'starforce' : 'star';
+        return <StarImage src={imageUrl} alt="Star" />;
+    };
+    Star.propTypes = {
+        current: PropTypes.number.isRequired,
+        index: PropTypes.number.isRequired,
+      };
+    const StarForceIcons = ({ current, level }) => { 
+        const stars = [];
+        const starforceCount = getStarForce(level);
+        for (let i = 1; i <= starforceCount; i++) { 
+            stars.push(
+                <Star key={i} current={current} index={i} />
+            );
+        }
+        return <div>{stars}</div>;
+    };
+    StarForceIcons.propTypes={
+        current: PropTypes.number.isRequired,
+        level: PropTypes.number.isRequired,
+    }
+
 
     return (
         <Container>
@@ -1036,7 +1060,6 @@ export default function StatEquip() {
                         if (seedring.includes(equip.item_name)) {
                             calculatedStat = equip.special_ring_level + 'Lv';
                         }
-                        const maxStarforce = getStarForce(equip.item_base_option.base_equipment_level);
 
                         let modifiedEquip = replaceText([equip])[0];
 
@@ -1044,7 +1067,11 @@ export default function StatEquip() {
                             <EquipContainer key={index} onMouseEnter={(e) => handleMouseEnter(index, e)} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
                                 {' '}
                                 <HoverDiv show={hoverIndex === index} zIndex={hoverIndex === index ? 5 : 4} {...hoverDivStyle}>
-                                    <HoverCover></HoverCover>
+                                {(equip.item_equipment_slot !== "포켓 아이템") || equip.item_equipment_part === "블레이드" ?
+                                    <StarForceIcons current = {parseInt(equip.starforce)} 
+                                    level = {equip.item_base_option.base_equipment_level}/> : null
+                                }
+                                    
                                     <HoverStarforce></HoverStarforce>
                                     {equip.item_equipment_slot === '무기' && <HoverSoul>{equip.soul_name.replace('소울 적용', '')}</HoverSoul>}
                                     <NameUpgrade>
@@ -1066,7 +1093,7 @@ export default function StatEquip() {
                                     <HoverDotline> </HoverDotline>
                                     <HoverImgLvContainer>
                                         <HoverImg imgUrl={equip.item_icon} Source={equip.item_equipment_part} />
-                                        <HoverLv>{equip.item_base_option.base_equipment_level}</HoverLv>
+                                        <HoverLv> ■ REC LEV : {equip.item_base_option.base_equipment_level}</HoverLv>
                                     </HoverImgLvContainer>
                                     <HoverDotline> </HoverDotline>
                                     <HoverEquipslot>장비분류 : {equip.item_equipment_part}</HoverEquipslot>
@@ -1825,6 +1852,7 @@ const LowerOption = styled.div`
 `;
 const AndroidContainer = styled.div``;
 const HoverDiv = styled.div`
+    font-family:'NEXON Lv1 Gothic OTF';
     display: ${(props) => (props.show ? 'block' : 'none')};
     position: absolute;
     top: ${(props) => props.top};
@@ -1883,7 +1911,13 @@ const HoverImgLvContainer = styled.div`
     display: flex;
     align-items: center;
 `;
-const HoverLv = styled.div``;
+const HoverLv = styled.div`
+    width: 100%;
+    text-align: left;
+    color: #F3C305;
+    font-size: 9px;
+    line-height: 1;    
+    `;
 const HoverImg = styled.div`
     margin: 1px;
     box-sizing: border-box;
@@ -1892,7 +1926,7 @@ const HoverImg = styled.div`
     background-repeat: no-repeat;
     padding: 20px;
     margin-left: 16px;
-    margin-right: 20px;
+    margin-right: 5px;
     margin-top: 8px;
     margin-bottom: 8px;
     background-position: 4.56px 4.56px, center, center, center;
@@ -2022,4 +2056,19 @@ const HoverDownName = styled.div`
 `;
 const HoverSoulOption = styled.div`
     color: #e5e542;
+`;
+const StarImage = styled.img`
+  width: 20px; 
+  height: 20px;  
+`;
+
+
+const Space = styled.span` // 스타포스 5개마다 공백
+    width: 5px;
+    display: inline-block;
+`;
+
+const LineBreak = styled.div` // 스타포스 15개 이 후 개행
+    flex-basis: 100%;
+    height: 0;
 `;
