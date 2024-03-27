@@ -74,7 +74,7 @@ import epic from '../picture/item/epic.png';
 import unique from '../picture/item/unique.png';
 import legendary from '../picture/item/legendary.png';
 
-import starforce from '../picture/item/starforce.png';
+import starforced from '../picture/item/starforce.png';
 import star from '../picture/item/star.png';
 import superiror from '../picture/item/superior.png';
 
@@ -722,28 +722,31 @@ export default function StatEquip() {
         }
     }
     const Star = ({ current, index }) => {
-        const imageUrl = current >= index ? 'starforce' : 'star';
+        // 현재 index에 따라 올바른 이미지를 선택합니다.
+        const imageUrl = current >= index ? starforced : star;
         return <StarImage src={imageUrl} alt="Star" />;
     };
     Star.propTypes = {
         current: PropTypes.number.isRequired,
         index: PropTypes.number.isRequired,
-      };
-    const StarForceIcons = ({ current, level }) => { 
+    };
+    const StarForceIcons = ({ current, level }) => {
         const stars = [];
         const starforceCount = getStarForce(level);
-        for (let i = 1; i <= starforceCount; i++) { 
-            stars.push(
-                <Star key={i} current={current} index={i} />
-            );
+        for (let i = 1; i <= starforceCount; i++) {
+            stars.push(<Star key={i} current={current} index={i} />);
+            if (i % 15 === 0) {
+                stars.push(<LineBreak key={'br' + i} />);
+            } else if (i % 5 === 0) {
+                stars.push(<Space key={'space1' + i} />);
+            }
         }
         return <div>{stars}</div>;
     };
-    StarForceIcons.propTypes={
+    StarForceIcons.propTypes = {
         current: PropTypes.number.isRequired,
         level: PropTypes.number.isRequired,
-    }
-
+    };
 
     return (
         <Container>
@@ -1067,11 +1070,10 @@ export default function StatEquip() {
                             <EquipContainer key={index} onMouseEnter={(e) => handleMouseEnter(index, e)} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
                                 {' '}
                                 <HoverDiv show={hoverIndex === index} zIndex={hoverIndex === index ? 5 : 4} {...hoverDivStyle}>
-                                {(equip.item_equipment_slot !== "포켓 아이템") || equip.item_equipment_part === "블레이드" ?
-                                    <StarForceIcons current = {parseInt(equip.starforce)} 
-                                    level = {equip.item_base_option.base_equipment_level}/> : null
-                                }
-                                    
+                                    {equip.item_equipment_slot !== '포켓 아이템' || equip.item_equipment_part === '블레이드' ? (
+                                        <StarForceIcons current={parseInt(equip.starforce)} level={equip.item_base_option.base_equipment_level} />
+                                    ) : null}
+
                                     <HoverStarforce></HoverStarforce>
                                     {equip.item_equipment_slot === '무기' && <HoverSoul>{equip.soul_name.replace('소울 적용', '')}</HoverSoul>}
                                     <NameUpgrade>
@@ -1852,7 +1854,7 @@ const LowerOption = styled.div`
 `;
 const AndroidContainer = styled.div``;
 const HoverDiv = styled.div`
-    font-family:'NEXON Lv1 Gothic OTF';
+    font-family: 'NEXON Lv1 Gothic OTF';
     display: ${(props) => (props.show ? 'block' : 'none')};
     position: absolute;
     top: ${(props) => props.top};
@@ -1914,10 +1916,10 @@ const HoverImgLvContainer = styled.div`
 const HoverLv = styled.div`
     width: 100%;
     text-align: left;
-    color: #F3C305;
+    color: #f3c305;
     font-size: 9px;
-    line-height: 1;    
-    `;
+    line-height: 1;
+`;
 const HoverImg = styled.div`
     margin: 1px;
     box-sizing: border-box;
@@ -2058,17 +2060,18 @@ const HoverSoulOption = styled.div`
     color: #e5e542;
 `;
 const StarImage = styled.img`
-  width: 20px; 
-  height: 20px;  
+    width: 12px;
+    height: 12px;
 `;
 
-
-const Space = styled.span` // 스타포스 5개마다 공백
+const Space = styled.span`
+    // 스타포스 5개마다 공백
     width: 5px;
     display: inline-block;
 `;
 
-const LineBreak = styled.div` // 스타포스 15개 이 후 개행
+const LineBreak = styled.div`
+    // 스타포스 15개 이 후 개행
     flex-basis: 100%;
     height: 0;
 `;
